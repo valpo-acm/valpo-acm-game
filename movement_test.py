@@ -22,6 +22,15 @@ def main():
     global FPSCLOCK, DISPLAYSURF
     pygame.init()
 
+    player_angle = 0
+    # set initial position of player
+    player_x = 10
+    player_y = (.8 * HEIGHT)
+    is_moving_left = False
+    is_moving_right = False
+    is_moving_up = False
+    is_moving_down = False
+
     # Create clock object
     FPSCLOCK = pygame.time.Clock()
     # set up window
@@ -32,22 +41,17 @@ def main():
     player_img = pygame.image.load('player.png')
     laser_sound = pygame.mixer.Sound('laser-gun-19sf.mp3')
 
-    # set initial position of player
-    player_x = 10
-    player_y = (.8 * HEIGHT)
-
-    is_moving_left = False
-    is_moving_right = False
-    is_moving_up = False
-    is_moving_down = False
     bullets = []
 
     # main game loop
     while True:
-        DISPLAYSURF.fill(BG)
 
+        # setup background color
+        DISPLAYSURF.fill(BG)
+        # create a player surface, and rotate the player image the appropriate number of degrees
+        PLAYER_SURF = pygame.transform.rotate(player_img, player_angle)
         # display player image at position
-        DISPLAYSURF.blit(player_img, (player_x, player_y))
+        DISPLAYSURF.blit(PLAYER_SURF, (player_x, player_y))
 
         if len(bullets) != 0:
             animate_bullets(bullets)
