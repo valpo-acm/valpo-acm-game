@@ -16,6 +16,8 @@ FPS = 60
 HEIGHT = 600
 WIDTH = 800
 
+
+
 def main():
     global FPSCLOCK, DISPLAYSURF
     pygame.init()
@@ -24,15 +26,15 @@ def main():
     FPSCLOCK = pygame.time.Clock()
     # set up window
     DISPLAYSURF = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
-    pygame.display.set_caption("A and D to move. Space to Shoot")
+    pygame.display.set_caption("WASD to move. Space to Shoot")
 
     # load image and sound files from filepath strings
-    cat_img = pygame.image.load('cat.png')
+    player_img = pygame.image.load('player.png')
     laser_sound = pygame.mixer.Sound('laser-gun-19sf.mp3')
 
-    # set initial position of cat
-    cat_x = 10
-    cat_y = (.8 * HEIGHT)
+    # set initial position of player
+    player_x = 10
+    player_y = (.8 * HEIGHT)
 
     is_moving_left = False
     is_moving_right = False
@@ -44,29 +46,29 @@ def main():
     while True:
         DISPLAYSURF.fill(BG)
 
-        # display cat image at position
-        DISPLAYSURF.blit(cat_img, (cat_x, cat_y))
+        # display player image at position
+        DISPLAYSURF.blit(player_img, (player_x, player_y))
 
         if len(bullets) != 0:
             animate_bullets(bullets)
 
-        # adjust cat's position
+        # adjust player's position
         if is_moving_left:
-            cat_x -= MOVEMENT_SPEED
-            if cat_x <= 10:
-                cat_x = 10
+            player_x -= MOVEMENT_SPEED
+            if player_x <= 10:
+                player_x = 10
         elif is_moving_right:
-            cat_x += MOVEMENT_SPEED
-            if cat_x >= WIDTH:
-                cat_x = WIDTH
+            player_x += MOVEMENT_SPEED
+            if player_x >= WIDTH:
+                player_x = WIDTH
         elif is_moving_up:
-            cat_y -= MOVEMENT_SPEED
-            if cat_y <= 10:
-                cat_y = 10
+            player_y -= MOVEMENT_SPEED
+            if player_y <= 10:
+                player_y = 10
         elif is_moving_down:
-            cat_y += MOVEMENT_SPEED
-            if cat_y >= HEIGHT:
-                cat_y = HEIGHT
+            player_y += MOVEMENT_SPEED
+            if player_y >= HEIGHT:
+                player_y = HEIGHT
 
 
         # respond to user input events
@@ -75,7 +77,7 @@ def main():
                 pygame.quit()
                 sys.exit()
             elif event.type == KEYUP and event.key == K_SPACE: # user presses spacebar
-                create_bullet(cat_x + 40, cat_y - 15, bullets)
+                create_bullet(player_x + 40, player_y - 15, bullets)
                 # laser_sound.play()
             elif event.type == KEYDOWN and event.key == K_a: # presses A
                 is_moving_left = True
