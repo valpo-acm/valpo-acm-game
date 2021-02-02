@@ -18,7 +18,7 @@ WIDTH = 800
 
 
 
-def main():
+def game():
     global FPSCLOCK, DISPLAYSURF
     pygame.init()
 
@@ -28,8 +28,8 @@ def main():
     player_y = (.8 * HEIGHT)
     is_moving_left = False
     is_moving_right = False
-    is_moving_up = False
-    is_moving_down = False
+    is_moving_forward = False
+    is_moving_backward = False
 
     # Create clock object
     FPSCLOCK = pygame.time.Clock()
@@ -43,7 +43,7 @@ def main():
 
     bullets = []
 
-    # main game loop
+    # game game loop
     while True:
 
         # setup background color
@@ -57,6 +57,7 @@ def main():
             animate_bullets(bullets)
 
         # adjust player's position
+        # TODO: factor in player_angle to movement
         if is_moving_left:
             player_x -= MOVEMENT_SPEED
             if player_x <= 10:
@@ -65,11 +66,11 @@ def main():
             player_x += MOVEMENT_SPEED
             if player_x >= WIDTH:
                 player_x = WIDTH
-        elif is_moving_up:
+        elif is_moving_forward:
             player_y -= MOVEMENT_SPEED
             if player_y <= 10:
                 player_y = 10
-        elif is_moving_down:
+        elif is_moving_backward:
             player_y += MOVEMENT_SPEED
             if player_y >= HEIGHT:
                 player_y = HEIGHT
@@ -93,13 +94,13 @@ def main():
                 is_moving_right = False
 
             elif event.type == KEYUP and event.key == K_w:
-                is_moving_up = False
+                is_moving_forward = False
             elif event.type == KEYDOWN and event.key == K_w:
-                is_moving_up = True
+                is_moving_forward = True
             elif event.type == KEYUP and event.key == K_s:
-                is_moving_down = False
+                is_moving_backward = False
             elif event.type == KEYDOWN and event.key == K_s:
-                is_moving_down = True
+                is_moving_backward = True
 
             # add in ability to move up and down
         pygame.display.update()
@@ -124,4 +125,4 @@ def animate_bullets(bullets_list):
 
 
 if __name__ == '__main__':
-    main()
+    game()
