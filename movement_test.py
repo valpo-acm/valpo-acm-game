@@ -24,7 +24,7 @@ def main():
     DISPLAYSURF = pygame.display.set_mode((400, 300), 0, 32)
     pygame.display.set_caption("A and D to move. Space to Shoot")
 
-    # load image and sound files
+    # load image and sound files from filepath strings
     cat_img = pygame.image.load('images/cat.png')
     laser_sound = pygame.mixer.Sound('sounds/laser-gun-19sf.mp3')
 
