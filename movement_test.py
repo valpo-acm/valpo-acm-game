@@ -37,6 +37,7 @@ def main():
     is_moving_left = False
     is_moving_right = False
     is_moving_up = False
+    is_moving_down = False
     bullets = []
 
     # main game loop
@@ -62,6 +63,10 @@ def main():
             cat_y -= MOVEMENT_SPEED
             if cat_y <= 10:
                 cat_y = 10
+        elif is_moving_down:
+            cat_y += MOVEMENT_SPEED
+            if cat_y >= HEIGHT:
+                cat_y = HEIGHT
 
 
         # respond to user input events
@@ -80,6 +85,16 @@ def main():
                 is_moving_right = True
             elif event.type == KEYUP and event.key == K_d: # releases d
                 is_moving_right = False
+
+            elif event.type == KEYUP and event.key == K_w:
+                is_moving_up = False
+            elif event.type == KEYDOWN and event.key == K_w:
+                is_moving_up = True
+            elif event.type == KEYUP and event.key == K_s:
+                is_moving_down = False
+            elif event.type == KEYDOWN and event.key == K_s:
+                is_moving_down = True
+
             # add in ability to move up and down
         pygame.display.update()
 
