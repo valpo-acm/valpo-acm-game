@@ -43,7 +43,7 @@ def game():
 
     # load image and sound files from filepath strings
     player_img = pygame.image.load('player.png')
-    laser_sound = pygame.mixer.Sound('laser-gun-19sf.mp3')
+    # laser_sound = pygame.mixer.Sound('laser-gun-19sf.mp3')
 
     bullets = []
 
