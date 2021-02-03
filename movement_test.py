@@ -18,15 +18,18 @@ WIDTH = 800
 
 DISPLAYSURF = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 
+# Current TODO:
+# - have the player angle impact the distance travelled
+# - use the current mouse position to set the player angle
 
 def game():
-    global FPSCLOCK, DISPLAYSURF
+    global FPSCLOCK
     pygame.init()
 
     player_angle = 0
     # set initial position of player
-    player_x = 10
-    player_y = (.8 * HEIGHT)
+    player_x = (.4 * WIDTH)
+    player_y = (.66 * HEIGHT)
     is_moving_left = False
     is_moving_right = False
     is_moving_forward = False
@@ -47,7 +50,7 @@ def game():
     # game game loop
     while True:
 
-        # setup background color
+        # set background color
         DISPLAYSURF.fill(BG)
         # create a player surface, and rotate the player image the appropriate number of degrees
         PLAYER_SURF = pygame.transform.rotate(player_img, player_angle)
@@ -93,7 +96,7 @@ def game():
                 is_moving_right = True
             elif event.type == KEYUP and event.key == K_d: # releases d
                 is_moving_right = False
-
+                # below is to move player forward and backward, same logic as above
             elif event.type == KEYUP and event.key == K_w:
                 is_moving_forward = False
             elif event.type == KEYDOWN and event.key == K_w:
@@ -103,7 +106,6 @@ def game():
             elif event.type == KEYDOWN and event.key == K_s:
                 is_moving_backward = True
 
-            # add in ability to move up and down
         pygame.display.update()
 
         # increment clock. Call at very end of game loop, once per iteration
@@ -124,8 +126,7 @@ def animate_bullets(bullets_list):
             # remove bullet when it reaches the top of the screen
             del bullet
 
-
-if __name__ == '__main__':
+def main():
     red = (255,0,0)
     load_game = False
     while (not load_game):
@@ -136,3 +137,6 @@ if __name__ == '__main__':
         pygame.display.flip()
 
     game()
+
+if __name__ == '__main__':
+    main()
