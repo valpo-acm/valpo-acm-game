@@ -16,6 +16,7 @@ FPS = 60
 HEIGHT = 600
 WIDTH = 800
 
+DISPLAYSURF = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 
 
 def game():
@@ -125,4 +126,13 @@ def animate_bullets(bullets_list):
 
 
 if __name__ == '__main__':
+    red = (255,0,0)
+    load_game = False
+    while (not load_game):
+        DISPLAYSURF.fill(red)
+        for event in pygame.event.get():
+            if event.type == MOUSEBUTTONDOWN:
+                load_game = True
+        pygame.display.flip()
+
     game()
