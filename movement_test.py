@@ -126,7 +126,7 @@ def animate_bullets(bullets_list):
             # remove bullet when it reaches the top of the screen
             del bullet
 
-def main():
+def welcome():
     red = (255,0,0)
     load_game = False
     while (not load_game):
@@ -136,6 +136,8 @@ def main():
                 load_game = True
         pygame.display.flip()
 
+def main():
+    welcome()
     game()
 
 if __name__ == '__main__':
