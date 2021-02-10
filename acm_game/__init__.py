@@ -2,6 +2,7 @@
 
 import pygame
 
+
 class GameObject:
     is_moving_left = False
     is_moving_right = False
@@ -15,7 +16,6 @@ class GameObject:
         # number of pixels the object can move per frame
         self.movement_speed = movement_speed
         self.color = color
-
 
     def move(self):
         # adjust rect center position based on movement direction. Possible to, e.g. move up and left simultaneously

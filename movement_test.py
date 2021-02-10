@@ -8,31 +8,29 @@ import random
 BG = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-# how many pixels the character or bullet can move per frame
-MOVEMENT_SPEED = 5
-BULLET_SPEED = 10
-
 # frames per second
 FPS = 60
 
-HEIGHT = 600
-WIDTH = 800
+WINDOW_HEIGHT = 600
+WINDOW_WIDTH = 800
 
-DISPLAYSURF = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
+DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 
 ENEMIES = []
 
 player_img = pygame.image.load('assets/player.png')
 enemy_img = pygame.image.load('assets/enemy.png')
 
+
 # Current TODO:
 # - have the player angle impact the distance travelled
 # - use the current mouse position to set the player angle
 
 def spawn_enemy():
-    w = random.choice(range(WIDTH))
-    h = random.choice(range(HEIGHT))
-    ENEMIES.append(Player(pygame.Rect(w, h, 75, 75), DISPLAYSURF, enemy_img))
+    w = random.choice(range(WINDOW_WIDTH))
+    # h = random.choice(range(WINDOW_HEIGHT))
+    ENEMIES.append(Player(pygame.Rect(w, 0, 75, 75), DISPLAYSURF, enemy_img))
+
 
 def game():
     global FPSCLOCK
@@ -41,18 +39,18 @@ def game():
     # Create clock object
     FPSCLOCK = pygame.time.Clock()
     # set up window
-    DISPLAYSURF = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
+    DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
     pygame.display.set_caption("WASD to move. Space to Shoot")
 
     # load image and sound files from filepath strings
-    # laser_sound = pygame.mixer.Sound('assets/laser-gun-19sf.mp3')
+    laser_sound = pygame.mixer.Sound('assets/laser-gun-19sf.mp3')
 
     # create player object with initial location. Size is approximate based on image file
-    player = Player(pygame.Rect(.4 * WIDTH, .66 * HEIGHT, 125, 80), DISPLAYSURF, player_img)
+    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 125, 80), DISPLAYSURF, player_img)
 
     bullets = []
 
-    # game game loop
+    # main game loop
     while True:
 
         # set background color
@@ -79,8 +77,8 @@ def game():
                 pygame.quit()
                 sys.exit()
             elif event.type == KEYUP and event.key == K_SPACE:  # user releases spacebar
-                player.shoot(bullets )
-                # laser_sound.play()
+                player.shoot(bullets)
+                laser_sound.play()
             elif event.type == KEYDOWN and event.key == K_a:  # presses A
                 player.is_moving_left = True
             elif event.type == KEYUP and event.key == K_a:  # releases A
@@ -122,6 +120,7 @@ def welcome():
 def main():
     welcome()
     game()
+
 
 if __name__ == '__main__':
     main()
