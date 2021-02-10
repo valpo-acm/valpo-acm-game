@@ -28,7 +28,7 @@ enemy_img = pygame.image.load('assets/enemy.png')
 
 def spawn_enemy():
     direction = random.choice(["diagonal", "down"])
-    speed = random.choice(range(1, 6))
+    speed = random.choice(range(2, 7))
     w = random.choice(range(WINDOW_WIDTH))
     # h = random.choice(range(WINDOW_HEIGHT))
 

@@ -56,6 +56,17 @@ class GameObject:
         # true if self.rect overlaps with other object's rect property
         return pygame.Rect.colliderect(self.rect, other.rect)
 
+    # helper method to debug movement
+    def report_direction(self):
+        if self.is_moving_left:
+            print("Moving left")
+        if self.is_moving_right:
+            print("Moving right")
+        if self.is_moving_up:
+            print("Moving up")
+        if self.is_moving_down:
+            print("Moving down")
+
 
 class Player(GameObject):
     # TODO: include rotation
@@ -106,14 +117,15 @@ class Enemy(GameObject):
 
     def zigzag(self):
         if self.counter % 30 == 0:
+            self.report_direction()
             # change direction every 0.5 seconds
             direction = random.choice(["left", "right", "down"])
             if direction == "left":
-                print("zigging!")
+                #print("zigging!")
                 self.is_moving_left = True
                 self.is_moving_right = False
             elif direction == "right":
-                print("zagging!")
+                #print("zagging!")
                 self.is_moving_left = False
                 self.is_moving_right = True
             elif direction == "down":
