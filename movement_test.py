@@ -2,6 +2,7 @@ import pygame
 import sys
 from pygame.locals import *
 from acm_game import *
+import random
 
 # RGB values
 BG = (255, 255, 255)
@@ -19,10 +20,19 @@ WIDTH = 800
 
 DISPLAYSURF = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 
+ENEMIES = []
+
+player_img = pygame.image.load('assets/player.png')
+enemy_img = pygame.image.load('assets/enemy.png')
 
 # Current TODO:
 # - have the player angle impact the distance travelled
 # - use the current mouse position to set the player angle
+
+def spawn_enemy():
+    w = random.choice(range(WIDTH))
+    h = random.choice(range(HEIGHT))
+    ENEMIES.append(Player(pygame.Rect(w, h, 75, 75), DISPLAYSURF, enemy_img))
 
 def game():
     global FPSCLOCK
@@ -35,14 +45,12 @@ def game():
     pygame.display.set_caption("WASD to move. Space to Shoot")
 
     # load image and sound files from filepath strings
-    player_img = pygame.image.load('assets/player.png')
     # laser_sound = pygame.mixer.Sound('assets/laser-gun-19sf.mp3')
 
     # create player object with initial location. Size is approximate based on image file
     player = Player(pygame.Rect(.4 * WIDTH, .66 * HEIGHT, 125, 80), DISPLAYSURF, player_img)
 
     bullets = []
-    enemies = []
 
     # game game loop
     while True:
@@ -56,6 +64,9 @@ def game():
         # DISPLAYSURF.blit(PLAYER_SURF, (player_x, player_y))
 
         player.animate()
+        for enemy in ENEMIES:
+            enemy.animate()
+
         for bullet in bullets:
             bullet.animate()
             if bullet.rect.centery <= 0:
@@ -87,6 +98,9 @@ def game():
                 player.is_moving_down = False
             elif event.type == KEYDOWN and event.key == K_s:
                 player.is_moving_down = True
+            # temporary testing line
+            elif event.type == KEYDOWN and event.key == K_e:
+                spawn_enemy()
 
         pygame.display.update()
 
