@@ -37,8 +37,8 @@ class GameObject:
         self.draw()
 
     def did_collide_with(self, other):
-        # TODO: use two objects' rect property to detect collisions. Return boolean
-        pass
+        # true if self.rect overlaps with other object's rect property
+        return pygame.Rect.colliderect(self.rect, other.rect)
 
 
 class Player(GameObject):
@@ -53,16 +53,19 @@ class Player(GameObject):
         GameObject.__init__(self, rect, surface, movement_speed)
         self.image = image
 
+    def __str__(self):
+        return "Player"
+
     def move(self):
         super().move()
 
     def draw(self):
-        self.surface.blit(self.image, (self.rect.centerx, self.rect.centery))
+        self.surface.blit(self.image, self.rect.topleft)
 
     def shoot(self, bullets_list):
         # TODO: is there a more elegant way to do this than passing in the bullets list?
-        x = self.rect.centerx + 40
-        y = self.rect.centery - 5
+        x = self.rect.centerx
+        y = self.rect.centery - 40
         bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface)
         bullets_list.append(bullet)
 
@@ -74,15 +77,22 @@ class Enemy(GameObject):
         GameObject.__init__(self, rect, surface, movement_speed)
         self.image = image
 
+    def __str__(self):
+        return "enemy"
+
     def draw(self):
         # TODO: blit image at rect location if image exists, else call object draw method
-        pass
+        pygame.draw.rect(self.surface, self.color, self.rect)
+        self.surface.blit(self.image, self.rect.topleft)
 
 
 class Bullet(GameObject):
 
     def __init__(self, rect, surface, movement_speed=10):
         GameObject.__init__(self, rect, surface, movement_speed)
+
+    def __str__(self):
+        return "bullet"
 
     def move(self):
         self.rect.centery -= self.movement_speed

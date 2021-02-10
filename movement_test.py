@@ -29,7 +29,7 @@ enemy_img = pygame.image.load('assets/enemy.png')
 def spawn_enemy():
     w = random.choice(range(WINDOW_WIDTH))
     # h = random.choice(range(WINDOW_HEIGHT))
-    ENEMIES.append(Player(pygame.Rect(w, 0, 75, 75), DISPLAYSURF, enemy_img))
+    ENEMIES.append(Enemy(pygame.Rect(w, 0, 75, 75), DISPLAYSURF, enemy_img))
 
 
 def game():
@@ -64,9 +64,15 @@ def game():
         player.animate()
         for enemy in ENEMIES:
             enemy.animate()
+            if enemy.did_collide_with(player):
+                print("enemy collided with player.")
 
         for bullet in bullets:
             bullet.animate()
+            for enemy in ENEMIES:
+                # for testing collision method in GameObject
+                if bullet.did_collide_with(enemy):
+                    print("bullet collided with enemy.")
             if bullet.rect.centery <= 0:
                 # remove bullet when it reaches the top of the screen
                 del bullet
