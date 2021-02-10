@@ -35,8 +35,8 @@ def game():
     pygame.display.set_caption("WASD to move. Space to Shoot")
 
     # load image and sound files from filepath strings
-    player_img = pygame.image.load('images/player.png')
-    # laser_sound = pygame.mixer.Sound('sounds/laser-gun-19sf.mp3')
+    player_img = pygame.image.load('assets/player.png')
+    # laser_sound = pygame.mixer.Sound('assets/laser-gun-19sf.mp3')
 
     # create player object with initial location. Size is approximate based on image file
     player = Player(pygame.Rect(.4 * WIDTH, .66 * HEIGHT, 125, 80), DISPLAYSURF, player_img)
