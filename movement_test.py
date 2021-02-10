@@ -27,9 +27,18 @@ enemy_img = pygame.image.load('assets/enemy.png')
 # - use the current mouse position to set the player angle
 
 def spawn_enemy():
+    direction = random.choice(range(3))
+    speed = random.choice(range(2, 8))
     w = random.choice(range(WINDOW_WIDTH))
     # h = random.choice(range(WINDOW_HEIGHT))
-    ENEMIES.append(Enemy(pygame.Rect(w, 0, 75, 75), DISPLAYSURF, enemy_img))
+
+    enemy = Enemy(pygame.Rect(w, 0, 75, 75), DISPLAYSURF, enemy_img, speed)
+    enemy.is_moving_down = True
+    if direction == 1:
+        enemy.is_moving_left = True
+    elif direction == 2:
+        enemy.is_moving_right = True
+    ENEMIES.append(enemy)
 
 
 def game():
@@ -62,20 +71,35 @@ def game():
         # DISPLAYSURF.blit(PLAYER_SURF, (player_x, player_y))
 
         player.animate()
+
         for enemy in ENEMIES:
             enemy.animate()
-            if enemy.did_collide_with(player):
-                print("enemy collided with player.")
+            if enemy.rect.centery > WINDOW_HEIGHT:
+                # enemy went off bottom of screen
+                ENEMIES.remove(enemy)
+            elif enemy.did_collide_with(player):
+                player.hitpoints -= 1
+                print(f"Hitpoints: {player.hitpoints}")
+                if player.hitpoints < 1:
+                    # GAME OVER!
+                    # TODO add GAME OVER screen
+                    pass
+                ENEMIES.remove(enemy)
 
         for bullet in bullets:
             bullet.animate()
-            for enemy in ENEMIES:
-                # for testing collision method in GameObject
-                if bullet.did_collide_with(enemy):
-                    print("bullet collided with enemy.")
             if bullet.rect.centery <= 0:
                 # remove bullet when it reaches the top of the screen
-                del bullet
+                bullets.remove(bullet)
+                continue
+            for enemy in ENEMIES:
+                if bullet.did_collide_with(enemy):
+                    # direct hit!
+                    # TODO add sound effect and explosion animation here
+                    bullets.remove(bullet)
+                    enemy.hitpoints -= 1
+                    if enemy.hitpoints < 1:
+                        ENEMIES.remove(enemy)
 
         # respond to user input events
         for event in pygame.event.get():

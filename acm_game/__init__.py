@@ -49,7 +49,7 @@ class Player(GameObject):
     hitpoints = 3
     angle = 0
 
-    def __init__(self, rect, surface, image, movement_speed=5):
+    def __init__(self, rect, surface, image, movement_speed=7):
         GameObject.__init__(self, rect, surface, movement_speed)
         self.image = image
 
