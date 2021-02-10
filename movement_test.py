@@ -27,17 +27,21 @@ enemy_img = pygame.image.load('assets/enemy.png')
 # - use the current mouse position to set the player angle
 
 def spawn_enemy():
-    direction = random.choice(range(3))
-    speed = random.choice(range(2, 8))
+    direction = random.choice(["diagonal", "down"])
+    speed = random.choice(range(1, 6))
     w = random.choice(range(WINDOW_WIDTH))
     # h = random.choice(range(WINDOW_HEIGHT))
 
     enemy = Enemy(pygame.Rect(w, 0, 75, 75), DISPLAYSURF, enemy_img, speed)
     enemy.is_moving_down = True
-    if direction == 1:
-        enemy.is_moving_left = True
-    elif direction == 2:
-        enemy.is_moving_right = True
+    # add left/right movement 1/2 of the time
+    if direction == "diagonal":
+        if w <= WINDOW_WIDTH / 2:
+            # spawned on left half of screen
+            enemy.is_moving_right = True
+        else:
+            #spawned on right side of screen
+            enemy.is_moving_left = True
     ENEMIES.append(enemy)
 
 

@@ -1,6 +1,7 @@
 # classes and methods for game objects for the acm shooter game
 
 import pygame
+import random
 
 
 class GameObject:
@@ -8,6 +9,8 @@ class GameObject:
     is_moving_right = False
     is_moving_up = False
     is_moving_down = False
+
+    counter = 1
 
     def __init__(self, rect, surface, movement_speed, color=(0, 0, 0)):
         # pygame rect object: use to define the object's size and position.
@@ -35,6 +38,7 @@ class GameObject:
     def animate(self):
         self.move()
         self.draw()
+        self.counter += 1
 
     def did_collide_with(self, other):
         # true if self.rect overlaps with other object's rect property
@@ -82,8 +86,27 @@ class Enemy(GameObject):
 
     def draw(self):
         # TODO: blit image at rect location if image exists, else call object draw method
-        pygame.draw.rect(self.surface, self.color, self.rect)
         self.surface.blit(self.image, self.rect.topleft)
+
+    def move(self):
+        self.zigzag()
+        GameObject.move(self)
+
+    def zigzag(self):
+        if self.counter % 30 == 0:
+            # change direction every 0.5 seconds
+            direction = random.choice(["left", "right", "down"])
+            if direction == "left":
+                print("zigging!")
+                self.is_moving_left = True
+                self.is_moving_right = False
+            elif direction == "right":
+                print("zagging!")
+                self.is_moving_left = False
+                self.is_moving_right = True
+            elif direction == "down":
+                self.is_moving_left = False
+                self.is_moving_right = False
 
 
 class Bullet(GameObject):
