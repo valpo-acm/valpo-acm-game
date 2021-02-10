@@ -19,13 +19,25 @@ class GameObject:
 
     def move(self):
         # adjust rect center position based on movement direction. Possible to, e.g. move up and left simultaneously
-        if self.is_moving_left:
+        if self.is_moving_left and self.is_moving_up:
+            self.rect.centerx -= int(.5 * self.movement_speed)
+            self.rect.centery -= int(.5 * self.movement_speed)
+        elif self.is_moving_right and self.is_moving_up:
+            self.rect.centerx += int(.5 * self.movement_speed)
+            self.rect.centery -= int(.5 * self.movement_speed)
+        elif self.is_moving_right and self.is_moving_down:
+            self.rect.centerx += int(.5 * self.movement_speed)
+            self.rect.centery += int(.5 * self.movement_speed)
+        elif self.is_moving_left and self.is_moving_down:
+            self.rect.centerx -= int(.5 * self.movement_speed)
+            self.rect.centery += int(.5 * self.movement_speed)
+        elif self.is_moving_left:
             self.rect.centerx -= self.movement_speed
-        if self.is_moving_right:
+        elif self.is_moving_right:
             self.rect.centerx += self.movement_speed
-        if self.is_moving_up:
+        elif self.is_moving_up:
             self.rect.centery -= self.movement_speed
-        if self.is_moving_down:
+        elif self.is_moving_down:
             self.rect.centery += self.movement_speed
 
     def draw(self):
