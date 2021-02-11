@@ -45,6 +45,15 @@ def spawn_enemy():
     ENEMIES.append(enemy)
 
 
+# function to calculate if the current game tick is the start of a wave
+def is_wave(current_tick, player_hp, player_score, current_num_enemies):
+    # first check if gametick is a multiple of 30 seconds
+    if current_tick % 30_000 == 0:
+        # if we already have 3 or more enemies, False
+        if current_num_enemies >= 3:
+            return False
+    return False
+
 def game():
     global FPSCLOCK
     pygame.init()
@@ -65,6 +74,17 @@ def game():
 
     # main game loop
     while True:
+
+        # Current Order:
+        # - fill backround
+        # - animate player
+        # - animate enemies
+        #   - determine if enimies go off screen; remove if they do
+        #   - determine if there are any collisions; remove hp if there are any; also remove enemy
+        # - animate bullets
+        # - respond to user events
+        # - update display
+        # - update the clock
 
         # set background color
         DISPLAYSURF.fill(BG)
@@ -89,8 +109,6 @@ def game():
                     # TODO add GAME OVER screen
                     pass
                 ENEMIES.remove(enemy)
-
-
 
 
         for bullet in bullets:
