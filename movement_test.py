@@ -11,6 +11,8 @@ BLACK = (0, 0, 0)
 # frames per second
 FPS = 60
 
+NUM_WAVES = 0
+
 WINDOW_HEIGHT = 600
 WINDOW_WIDTH = 800
 
@@ -46,16 +48,20 @@ def spawn_enemy():
 
 
 # function to calculate if the current game tick is the start of a wave
-def is_wave(current_tick, player_hp, player_score, current_num_enemies):
-    # first check if gametick is a multiple of 30 seconds
-    if current_tick % 30_000 == 0:
-        # if we already have 3 or more enemies, False
-        if current_num_enemies >= 3:
-            return False
+def is_wave(current_num_enemies):
+    # if we already have 3 or more enemies, False
+    if current_num_enemies < 3:
+        return True
     return False
+
+def spawn_enemy_wave(num_prev_waves, player_score, player_hp):
+    number_of_enemies = int(.3 * num_prev_waves + player_score % 3 - player_hp * .5 + 3)
+    for i in range(number_of_enemies):
+        spawn_enemy()
 
 def game():
     global FPSCLOCK
+    global NUM_WAVES
     pygame.init()
 
     # Create clock object
@@ -93,6 +99,13 @@ def game():
         # PLAYER_SURF = pygame.transform.rotate(player_img, player_angle)
         # display player image at position
         # DISPLAYSURF.blit(PLAYER_SURF, (player_x, player_y))
+
+        if FPSCLOCK.get_time() % 16 == 0:
+            # check if we start a wave
+            if is_wave(len(ENEMIES)):
+                print("Spawning Enemy Wave")
+                spawn_enemy_wave(NUM_WAVES, 0, 0)
+                NUM_WAVES += 1
 
         player.animate()
 
