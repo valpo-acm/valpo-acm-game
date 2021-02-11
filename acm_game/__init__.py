@@ -77,13 +77,14 @@ class Player(GameObject):
     angle = 0
 
     def __init__(self, rect, surface, image, movement_speed=7):
-        GameObject.__init__(self, rect, surface, movement_speed)
+        super().__init__(rect, surface, movement_speed)
         self.image = image
 
     def __str__(self):
         return "Player"
 
     def move(self):
+        # eventually override here for rotation
         super().move()
 
     def draw(self):
@@ -101,7 +102,7 @@ class Enemy(GameObject):
     hitpoints = 1
 
     def __init__(self, rect, surface, image, movement_speed=7):
-        GameObject.__init__(self, rect, surface, movement_speed)
+        super().__init__(rect, surface, movement_speed)
         self.image = image
 
     def __str__(self):
@@ -113,19 +114,23 @@ class Enemy(GameObject):
 
     def move(self):
         self.zigzag()
-        GameObject.move(self)
+        super().move()
 
     def zigzag(self):
-        if self.counter % 30 == 0:
+        # Change direction at somewhat random times. Move() is called and the counter increments once per frame.
+        # At 60 FPS, counter % 60 should happen about once per second.  counter % 30 every half second, etc
+        # So the enemies will zig or zag on average sometime between every 0.5 - 1,5 seconds.
+        mod_value = random.choice(range(30, 90))
+
+        if self.counter % mod_value == 0:
             self.report_direction()
-            # change direction every 0.5 seconds
             direction = random.choice(["left", "right", "down"])
             if direction == "left":
-                #print("zigging!")
+                # print("zigging!")
                 self.is_moving_left = True
                 self.is_moving_right = False
             elif direction == "right":
-                #print("zagging!")
+                # print("zagging!")
                 self.is_moving_left = False
                 self.is_moving_right = True
             elif direction == "down":
@@ -136,7 +141,7 @@ class Enemy(GameObject):
 class Bullet(GameObject):
 
     def __init__(self, rect, surface, movement_speed=10):
-        GameObject.__init__(self, rect, surface, movement_speed)
+        super().__init__(rect, surface, movement_speed)
 
     def __str__(self):
         return "bullet"

@@ -28,7 +28,7 @@ enemy_img = pygame.image.load('assets/enemy.png')
 
 def spawn_enemy():
     direction = random.choice(["diagonal", "down"])
-    speed = random.choice(range(2, 7))
+    speed = random.choice(range(2, 8))
     w = random.choice(range(WINDOW_WIDTH))
     # h = random.choice(range(WINDOW_HEIGHT))
 
@@ -40,7 +40,7 @@ def spawn_enemy():
             # spawned on left half of screen
             enemy.is_moving_right = True
         else:
-            #spawned on right side of screen
+            # spawned on right side of screen
             enemy.is_moving_left = True
     ENEMIES.append(enemy)
 
@@ -89,6 +89,9 @@ def game():
                     # TODO add GAME OVER screen
                     pass
                 ENEMIES.remove(enemy)
+
+
+
 
         for bullet in bullets:
             bullet.animate()
