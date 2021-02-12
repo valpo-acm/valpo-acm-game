@@ -3,6 +3,10 @@ import sys
 from pygame.locals import *
 from acm_game import *
 import random
+import pygame.freetype
+
+pygame.init()
+scoreboardFont = pygame.freetype.SysFont('Comic Sans MS', 50, bold=True)
 
 # RGB values
 BG = (255, 255, 255)
@@ -19,6 +23,8 @@ WINDOW_WIDTH = 800
 DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 
 ENEMIES = []
+
+PLAYER_SCORE = 0
 
 player_img = pygame.image.load('assets/player.png')
 enemy_img = pygame.image.load('assets/enemy.png')
@@ -47,16 +53,15 @@ def spawn_enemy():
     ENEMIES.append(enemy)
 
 
-# function to calculate if the current game tick is the start of a wave
+# function to calculate if there should be a new wave
 def is_wave(current_num_enemies):
-    # if we already have 3 or more enemies, False
     if current_num_enemies < 3:
         return True
     return False
 
 def spawn_enemy_wave(num_prev_waves, player_score, player_hp):
-    number_of_enemies = int(.3 * num_prev_waves + player_score % 3 - player_hp * .5 + 3)
-    for i in range(number_of_enemies):
+    num_of_enemies = int(.3 * num_prev_waves + player_score % 3 - player_hp * .5 + 3)
+    for i in range(num_of_enemies):
         spawn_enemy()
 
 def game():
@@ -75,6 +80,7 @@ def game():
 
     # create player object with initial location. Size is approximate based on image file
     player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 125, 80), DISPLAYSURF, player_img)
+
 
     bullets = []
 
@@ -134,6 +140,8 @@ def game():
                 if bullet.did_collide_with(enemy):
                     # direct hit!
                     # TODO add sound effect and explosion animation here
+                    # TODO: we need to fix a bug here; there will be occasions where bullets fail to get
+                    # removed from the list, hence the need for the try-except
                     try:
                         bullets.remove(bullet)
                     except:
@@ -171,6 +179,8 @@ def game():
             elif event.type == KEYDOWN and event.key == K_e:
                 spawn_enemy()
 
+        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(PLAYER_SCORE), BLACK)
+        pygame.display.flip()
         pygame.display.update()
 
         # increment clock. Call at very end of game loop, once per iteration
