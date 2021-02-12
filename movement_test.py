@@ -134,7 +134,10 @@ def game():
                 if bullet.did_collide_with(enemy):
                     # direct hit!
                     # TODO add sound effect and explosion animation here
-                    bullets.remove(bullet)
+                    try:
+                        bullets.remove(bullet)
+                    except:
+                        print("failed to remove bullet")
                     enemy.hitpoints -= 1
                     if enemy.hitpoints < 1:
                         ENEMIES.remove(enemy)
