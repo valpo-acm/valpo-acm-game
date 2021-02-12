@@ -67,6 +67,7 @@ def spawn_enemy_wave(num_prev_waves, player_score, player_hp):
 def game():
     global FPSCLOCK
     global NUM_WAVES
+    global PLAYER_SCORE
     pygame.init()
 
     # Create clock object
@@ -149,6 +150,7 @@ def game():
                     enemy.hitpoints -= 1
                     if enemy.hitpoints < 1:
                         ENEMIES.remove(enemy)
+                        PLAYER_SCORE += 1
 
         # respond to user input events
         for event in pygame.event.get():
