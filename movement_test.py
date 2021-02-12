@@ -60,7 +60,11 @@ def is_wave(current_num_enemies):
     return False
 
 def spawn_enemy_wave(num_prev_waves, player_score, player_hp):
-    num_of_enemies = int(.3 * num_prev_waves + player_score % 3 - player_hp * .5 + 3)
+    # .3 * number of prev waves - we want 1 more enemy for every 3 waves
+    # player_score % 3 - this is a way to add randomness to the waves, while not being taxing on resources; will spawn between 0 and 2 enemies
+    # player_hp * .5 - we subtract this value, because as player health goes down, the number of enemy spawns goes up; a penalty for taking damage
+    # and lastly the + 3 ; this is so that we meet the 'wave' conditions
+    num_of_enemies = int((.3 * num_prev_waves) + (player_score % 3) - (player_hp * .5 ) + 3)
     for i in range(num_of_enemies):
         spawn_enemy()
 
@@ -107,6 +111,9 @@ def game():
         # display player image at position
         # DISPLAYSURF.blit(PLAYER_SURF, (player_x, player_y))
 
+        # admittedly this line is a bit hacky; when printing out the value of 'FPSCLOCK.get_time()'
+        # prints only 16s, so my original thought was wrong in how it worked. So this line is really
+        # just a temporary workaround for a real solution in the future.
         if FPSCLOCK.get_time() % 16 == 0:
             # check if we start a wave
             if is_wave(len(ENEMIES)):
