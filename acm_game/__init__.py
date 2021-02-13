@@ -58,15 +58,13 @@ class GameObject:
 
     def bounce_off(self, other):
         if other != self and self.did_collide_with(other):
-            # I have a bug here somewhere. Only the if statement is running. No collision ever triggers the elif.
-            # they can't bounce left for some reason
-            if self.rect.left < other.rect.right:
-                # collided on left, move right to avoid
+            if self.rect.centerx > other.rect.centerx:
+                # to the right of other object, move right to avoid
                 print("Bouncing right")
                 self.is_moving_left = False
                 self.is_moving_right = True
-            elif self.rect.right > other.rect.left:
-                # collided on right, move left to avoid
+            elif self.rect.centerx < other.rect.centerx:
+                # to the left of other object, move left to avoid
                 print("Bouncing left")
                 self.is_moving_left = True
                 self.is_moving_right = False
