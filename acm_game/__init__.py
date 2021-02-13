@@ -98,7 +98,15 @@ class Player(GameObject):
         return "Player"
 
     def move(self):
-        # eventually override here for rotation
+        # prevent player from going off the screen
+        if self.rect.left <= 0:
+            self.is_moving_left = False
+        if self.rect.right >= self.surface.get_width():
+            self.is_moving_right = False
+        if self.rect.top <= 0:
+            self.is_moving_up = False
+        if self.rect.bottom >= self.surface.get_height():
+            self.is_moving_down = False
         super().move()
 
     def draw(self):
