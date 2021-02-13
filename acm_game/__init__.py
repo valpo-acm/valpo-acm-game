@@ -56,6 +56,22 @@ class GameObject:
         # true if self.rect overlaps with other object's rect property
         return pygame.Rect.colliderect(self.rect, other.rect)
 
+    def bounce_off(self, other):
+        if other != self and self.did_collide_with(other):
+            # I have a bug here somewhere. Only the if statement is running. No collision ever triggers the elif.
+            # they can't bounce left for some reason
+            if self.rect.left < other.rect.right:
+                # collided on left, move right to avoid
+                print("Bouncing right")
+                self.is_moving_left = False
+                self.is_moving_right = True
+            elif self.rect.right > other.rect.left:
+                # collided on right, move left to avoid
+                print("Bouncing left")
+                self.is_moving_left = True
+                self.is_moving_right = False
+
+
     # helper method to debug movement
     def report_direction(self):
         if self.is_moving_left:
@@ -123,14 +139,12 @@ class Enemy(GameObject):
         mod_value = random.choice(range(30, 90))
 
         if self.counter % mod_value == 0:
-            self.report_direction()
+            # self.report_direction()
             direction = random.choice(["left", "right", "down"])
             if direction == "left":
-                # print("zigging!")
                 self.is_moving_left = True
                 self.is_moving_right = False
             elif direction == "right":
-                # print("zagging!")
                 self.is_moving_left = False
                 self.is_moving_right = True
             elif direction == "down":

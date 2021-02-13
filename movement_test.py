@@ -125,6 +125,8 @@ def game():
 
         for enemy in ENEMIES:
             enemy.animate()
+            for other_enemy in ENEMIES:
+                enemy.bounce_off(other_enemy)
             if enemy.rect.centery > WINDOW_HEIGHT:
                 # enemy went off bottom of screen
                 ENEMIES.remove(enemy)
