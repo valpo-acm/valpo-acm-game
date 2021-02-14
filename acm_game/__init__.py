@@ -60,15 +60,12 @@ class GameObject:
         if other != self and self.did_collide_with(other):
             if self.rect.centerx > other.rect.centerx:
                 # to the right of other object, move right to avoid
-                print("Bouncing right")
                 self.is_moving_left = False
                 self.is_moving_right = True
             elif self.rect.centerx < other.rect.centerx:
                 # to the left of other object, move left to avoid
-                print("Bouncing left")
                 self.is_moving_left = True
                 self.is_moving_right = False
-
 
     # helper method to debug movement
     def report_direction(self):
@@ -159,6 +156,9 @@ class Enemy(GameObject):
 
 
 class Bullet(GameObject):
+    explosion_counter = 0
+    is_exploding = False
+    is_finished_exploding = False
 
     def __init__(self, rect, surface, movement_speed=10):
         super().__init__(rect, surface, movement_speed)
@@ -168,3 +168,28 @@ class Bullet(GameObject):
 
     def move(self):
         self.rect.centery -= self.movement_speed
+
+    def explode(self):
+        # "magic number" 24 is the number of explosion images in the folder
+        if self.explosion_counter >= 24:
+            self.is_exploding = False
+            self.is_finished_exploding = True
+        else:
+            image_path = self.get_explosion_path()
+            image = pygame.image.load(image_path)
+            self.surface.blit(image, self.rect.topleft)
+            self.explosion_counter += 1
+
+    def animate(self):
+        if self.is_exploding:
+            self.explode()
+        else:
+            super().animate()
+
+    def get_explosion_path(self):
+        path = 'assets/Explosion/expl_02_00'
+        if self.explosion_counter <= 9:
+            path += f'0{self.explosion_counter}.png'
+        else:
+            path += f'{self.explosion_counter}.png'
+        return path

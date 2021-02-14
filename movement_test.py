@@ -40,7 +40,8 @@ def spawn_enemy():
     w = random.choice(range(WINDOW_WIDTH))
     # h = random.choice(range(WINDOW_HEIGHT))
 
-    enemy = Enemy(pygame.Rect(w, 0, 75, 75), DISPLAYSURF, enemy_img, speed)
+    # enemy spawns just off the top of the screen, so we don't see them pop into existence
+    enemy = Enemy(pygame.Rect(w, -80, 75, 75), DISPLAYSURF, enemy_img, speed)
     enemy.is_moving_down = True
     # add left/right movement 1/2 of the time
     if direction == "diagonal":
@@ -147,16 +148,18 @@ def game():
                 # remove bullet when it reaches the top of the screen
                 bullets.remove(bullet)
                 continue
+            if bullet.is_finished_exploding:
+                try:
+                    bullets.remove(bullet)
+                except:
+                    print("failed to remove bullet")
             for enemy in ENEMIES:
-                if bullet.did_collide_with(enemy):
+                if bullet.did_collide_with(enemy) and bullet.is_exploding is False:
                     # direct hit!
                     # TODO add sound effect and explosion animation here
                     # TODO: we need to fix a bug here; there will be occasions where bullets fail to get
                     # removed from the list, hence the need for the try-except
-                    try:
-                        bullets.remove(bullet)
-                    except:
-                        print("failed to remove bullet")
+                    bullet.is_exploding = True
                     enemy.hitpoints -= 1
                     if enemy.hitpoints < 1:
                         ENEMIES.remove(enemy)
