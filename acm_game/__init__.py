@@ -133,6 +133,14 @@ class Enemy(GameObject):
 
     def move(self):
         self.zigzag()
+        if self.rect.centerx < 0:
+            # enemy moving off the left edge of screen, move back in
+            self.is_moving_left = False
+            self.is_moving_right = True
+        elif self.rect.centerx > self.surface.get_width():
+            # enemy moving off the right edge of screen, move back in
+            self.is_moving_left = True
+            self.is_moving_right = False
         super().move()
 
     def zigzag(self):
