@@ -59,14 +59,16 @@ def is_wave(current_num_enemies):
         return True
     return False
 
+
 def spawn_enemy_wave(num_prev_waves, player_score, player_hp):
     # .3 * number of prev waves - we want 1 more enemy for every 3 waves
     # player_score % 3 - this is a way to add randomness to the waves, while not being taxing on resources; will spawn between 0 and 2 enemies
     # player_hp * .5 - we subtract this value, because as player health goes down, the number of enemy spawns goes up; a penalty for taking damage
     # and lastly the + 3 ; this is so that we meet the 'wave' conditions
-    num_of_enemies = int((.3 * num_prev_waves) + (player_score % 3) - (player_hp * .5 ) + 3)
+    num_of_enemies = int((.3 * num_prev_waves) + (player_score % 3) - (player_hp * .5) + 3)
     for i in range(num_of_enemies):
         spawn_enemy()
+
 
 def game():
     global FPSCLOCK
@@ -85,7 +87,6 @@ def game():
 
     # create player object with initial location. Size is approximate based on image file
     player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 125, 80), DISPLAYSURF, player_img)
-
 
     bullets = []
 
@@ -130,6 +131,7 @@ def game():
             if enemy.rect.centery > WINDOW_HEIGHT:
                 # enemy went off bottom of screen
                 ENEMIES.remove(enemy)
+                PLAYER_SCORE -= 1
             elif enemy.did_collide_with(player):
                 player.hitpoints -= 1
                 print(f"Hitpoints: {player.hitpoints}")
@@ -138,7 +140,6 @@ def game():
                     # TODO add GAME OVER screen
                     pass
                 ENEMIES.remove(enemy)
-
 
         for bullet in bullets:
             bullet.animate()
@@ -191,6 +192,8 @@ def game():
                 spawn_enemy()
 
         scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(PLAYER_SCORE), BLACK)
+
+        # I dont think we need both flip() and update(). I think they do the same thing when you call with no arguments
         pygame.display.flip()
         pygame.display.update()
 
