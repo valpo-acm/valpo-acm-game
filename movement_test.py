@@ -171,7 +171,8 @@ def game():
                 pygame.quit()
                 sys.exit()
             elif event.type == KEYUP and event.key == K_SPACE:  # user releases spacebar
-                player.shoot(bullets)
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                player.shoot(mouse_x, mouse_y, bullets)
                 laser_sound.play()
             elif event.type == KEYDOWN and event.key == K_a:  # presses A
                 player.is_moving_left = True

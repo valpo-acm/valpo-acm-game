@@ -109,11 +109,11 @@ class Player(GameObject):
     def draw(self):
         self.surface.blit(self.image, self.rect.topleft)
 
-    def shoot(self, bullets_list):
+    def shoot(self, target_x, target_y, bullets_list):
         # TODO: is there a more elegant way to do this than passing in the bullets list?
         x = self.rect.centerx
         y = self.rect.centery - 40
-        bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface)
+        bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface, target_x, target_y)
         bullets_list.append(bullet)
 
 
@@ -168,14 +168,53 @@ class Bullet(GameObject):
     is_exploding = False
     is_finished_exploding = False
 
-    def __init__(self, rect, surface, movement_speed=10):
+    def __init__(self, rect, surface, target_x, target_y, movement_speed=10):
         super().__init__(rect, surface, movement_speed)
+
+        self.delta_y = target_y - self.rect.centery
+        self.delta_x = target_x - self.rect.centerx
+        if self.delta_x != 0:
+            self.slope = self.delta_y / self.delta_x
+        else:
+            # avoid division by zero
+            self.slope = None
+
 
     def __str__(self):
         return "bullet"
 
     def move(self):
-        self.rect.centery -= self.movement_speed
+
+        # move towards target using slope of line between bullet start location and target location
+        # can only deal with shooting in an upwards direction for now.
+        # TODO: currently as the slope gets bigger as the angle approaches a vertical shot, the bullet moves faster and faster upwards.
+        # need to adjust this somehow to slow it down
+
+        if self.slope == None:
+            # slope calculation would cause division by zero. Move straight up instead
+            self.is_moving_up = True
+            super().move()
+        elif self.delta_y >= 0:
+            # target is "behind" player. Shoot straight left or right
+            if self.delta_x > 0:
+                # target to the right
+                self.is_moving_right = True
+                self.is_moving_left = False
+                super().move()
+            else:
+                # target to the left
+                self.is_moving_right = False
+                self.is_moving_left = True
+                super().move()
+        else:
+            if self.slope > 0:
+                self.rect.centerx -= self.movement_speed
+                self.rect.centery -= (self.movement_speed * self.slope)
+            else:
+                self.rect.centerx += self.movement_speed
+                self.rect.centery += (self.movement_speed * self.slope)
+
+
 
     def explode(self):
         # "magic number" 24 is the number of explosion images in the folder
