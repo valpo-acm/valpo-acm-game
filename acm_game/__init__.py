@@ -2,6 +2,7 @@
 
 import pygame
 import random
+import math
 
 
 class GameObject:
@@ -170,51 +171,17 @@ class Bullet(GameObject):
 
     def __init__(self, rect, surface, target_x, target_y, movement_speed=10):
         super().__init__(rect, surface, movement_speed)
-
-        self.delta_y = target_y - self.rect.centery
-        self.delta_x = target_x - self.rect.centerx
-        if self.delta_x != 0:
-            self.slope = self.delta_y / self.delta_x
-        else:
-            # avoid division by zero
-            self.slope = None
-
+        self.x_movement_value = 0
+        self.y_movement_value = 0
+        self.calculate_movement_values(target_x, target_y)
 
     def __str__(self):
         return "bullet"
 
     def move(self):
 
-        # move towards target using slope of line between bullet start location and target location
-        # can only deal with shooting in an upwards direction for now.
-        # TODO: currently as the slope gets bigger as the angle approaches a vertical shot, the bullet moves faster and faster upwards.
-        # need to adjust this somehow to slow it down
-
-        if self.slope == None:
-            # slope calculation would cause division by zero. Move straight up instead
-            self.is_moving_up = True
-            super().move()
-        elif self.delta_y >= 0:
-            # target is "behind" player. Shoot straight left or right
-            if self.delta_x > 0:
-                # target to the right
-                self.is_moving_right = True
-                self.is_moving_left = False
-                super().move()
-            else:
-                # target to the left
-                self.is_moving_right = False
-                self.is_moving_left = True
-                super().move()
-        else:
-            if self.slope > 0:
-                self.rect.centerx -= self.movement_speed
-                self.rect.centery -= (self.movement_speed * self.slope)
-            else:
-                self.rect.centerx += self.movement_speed
-                self.rect.centery += (self.movement_speed * self.slope)
-
-
+        self.rect.centerx += self.x_movement_value
+        self.rect.centery += self.y_movement_value
 
     def explode(self):
         # "magic number" 24 is the number of explosion images in the folder
@@ -240,3 +207,39 @@ class Bullet(GameObject):
         else:
             path += f'{self.explosion_counter}.png'
         return path
+
+    def calculate_movement_values(self, target_x, target_y):
+
+        delta_y = target_y - self.rect.centery
+        delta_x = target_x - self.rect.centerx
+
+        if delta_x != 0:
+
+            movement_angle = math.atan(abs(delta_y) / abs(delta_x))
+            x_movement = self.movement_speed * math.cos(movement_angle)
+            y_movement = self.movement_speed * math.sin(movement_angle)
+
+            if delta_x > 0:
+                # target to the right, movement value is positive
+                self.x_movement_value = x_movement
+            else:
+                # target to the left, movement value is negative
+                self.x_movement_value = x_movement * -1
+
+            if delta_y > 0:
+                # target below player, move down
+                self.y_movement_value = y_movement
+            else:
+                # target above player, move up
+                self.y_movement_value = y_movement * -1
+
+        else:
+            # avoid division by zero
+            # target directly above or below player
+            self.x_movement_value = 0
+            if delta_y <= 0:
+                # target above player
+                self.y_movement_value = self.movement_speed
+            else:
+                # target below player
+                self.y_movement_value = self.movement_speed * -1

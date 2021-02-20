@@ -144,8 +144,10 @@ def game():
 
         for bullet in bullets:
             bullet.animate()
-            if bullet.rect.centery <= 0:
-                # remove bullet when it reaches the top of the screen
+            x = bullet.rect.centerx
+            y = bullet.rect.centery
+            if y < 0 or y > WINDOW_HEIGHT or x < 0 or x > WINDOW_WIDTH:
+                # remove bullet when it goes off screen
                 bullets.remove(bullet)
                 continue
             if bullet.is_finished_exploding:
