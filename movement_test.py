@@ -34,6 +34,12 @@ enemy_img = pygame.image.load('assets/enemy.png')
 # - have the player angle impact the distance travelled
 # - use the current mouse position to set the player angle
 
+def gameover():
+    gameover_img = pygame.image.load('assets/gameover.png')
+    DISPLAYSURF.fill(BLACK)
+    DISPLAYSURF.blit(gameover_img, (0,0))
+
+
 def spawn_enemy():
     direction = random.choice(["diagonal", "down"])
     speed = random.choice(range(2, 8))
@@ -139,6 +145,7 @@ def game():
                 if player.hitpoints < 1:
                     # GAME OVER!
                     # TODO add GAME OVER screen
+                    #gameover()
                     pass
                 ENEMIES.remove(enemy)
 
@@ -205,6 +212,8 @@ def game():
 
         # increment clock. Call at very end of game loop, once per iteration
         FPSCLOCK.tick(FPS)
+
+    #gameover();
 
 
 def welcome():
