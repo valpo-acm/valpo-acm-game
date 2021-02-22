@@ -178,8 +178,8 @@ class Bullet(GameObject):
         self.rect.centery -= self.movement_speed
 
     def explode(self):
-        # "magic number" 24 is the number of explosion images in the folder
-        if self.explosion_counter >= 24:
+        # "magic number" 9 is the number of explosion images in the folder
+        if self.explosion_counter >= 9:
             self.is_exploding = False
             self.is_finished_exploding = True
         else:
@@ -195,9 +195,4 @@ class Bullet(GameObject):
             super().animate()
 
     def get_explosion_path(self):
-        path = 'assets/Explosion/expl_02_00'
-        if self.explosion_counter <= 9:
-            path += f'0{self.explosion_counter}.png'
-        else:
-            path += f'{self.explosion_counter}.png'
-        return path
+        return f'assets/explosion/explosion{self.explosion_counter}.png'

@@ -9,7 +9,7 @@ pygame.init()
 scoreboardFont = pygame.freetype.SysFont('Comic Sans MS', 50, bold=True)
 
 # RGB values
-BG = (255, 255, 255)
+BG = (32, 32, 64)
 BLACK = (0, 0, 0)
 
 # frames per second
@@ -17,8 +17,8 @@ FPS = 60
 
 NUM_WAVES = 0
 
-WINDOW_HEIGHT = 600
-WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 800
+WINDOW_WIDTH = 600
 
 DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 
@@ -87,7 +87,7 @@ def game():
     laser_sound = pygame.mixer.Sound('assets/laser-gun-19sf.mp3')
 
     # create player object with initial location. Size is approximate based on image file
-    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 125, 80), DISPLAYSURF, player_img)
+    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 128, 128), DISPLAYSURF, player_img)
 
     bullets = []
 
