@@ -9,7 +9,7 @@ pygame.init()
 scoreboardFont = pygame.freetype.SysFont('Comic Sans MS', 50, bold=True)
 
 # RGB values
-BG = (32, 32, 64)
+BG = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 # frames per second
@@ -28,11 +28,17 @@ PLAYER_SCORE = 0
 
 player_img = pygame.image.load('assets/player.png')
 enemy_img = pygame.image.load('assets/enemy.png')
-
+background_img = pygame.image.load('assets/background.png')
 
 # Current TODO:
 # - have the player angle impact the distance travelled
 # - use the current mouse position to set the player angle
+
+def gameover():
+    gameover_img = pygame.image.load('assets/gameover.png')
+    DISPLAYSURF.fill(BLACK)
+    DISPLAYSURF.blit(gameover_img, (0,0))
+
 
 def spawn_enemy():
     direction = random.choice(["diagonal", "down"])
@@ -87,13 +93,11 @@ def game():
     laser_sound = pygame.mixer.Sound('assets/laser-gun-19sf.mp3')
 
     # create player object with initial location. Size is approximate based on image file
-    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 128, 128), DISPLAYSURF, player_img)
+    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 125, 80), DISPLAYSURF, player_img)
 
     bullets = []
-
     # main game loop
     while True:
-
         # Current Order:
         # - fill backround
         # - animate player
@@ -106,7 +110,7 @@ def game():
         # - update the clock
 
         # set background color
-        DISPLAYSURF.fill(BG)
+        DISPLAYSURF.blit(background_img, (0,0))
         # create a player surface, and rotate the player image the appropriate number of degrees
         # player_angle = 0
         # PLAYER_SURF = pygame.transform.rotate(player_img, player_angle)
@@ -139,13 +143,16 @@ def game():
                 if player.hitpoints < 1:
                     # GAME OVER!
                     # TODO add GAME OVER screen
+                    #gameover()
                     pass
                 ENEMIES.remove(enemy)
 
         for bullet in bullets:
             bullet.animate()
-            if bullet.rect.centery <= 0:
-                # remove bullet when it reaches the top of the screen
+            x = bullet.rect.centerx
+            y = bullet.rect.centery
+            if y < 0 or y > WINDOW_HEIGHT or x < 0 or x > WINDOW_WIDTH:
+                # remove bullet when it goes off screen
                 bullets.remove(bullet)
                 continue
             if bullet.is_finished_exploding:
@@ -170,8 +177,9 @@ def game():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == KEYUP and event.key == K_SPACE:  # user releases spacebar
-                player.shoot(bullets)
+            elif event.type == MOUSEBUTTONDOWN:  # user releases spacebar
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                player.shoot(mouse_x, mouse_y, bullets)
                 laser_sound.play()
             elif event.type == KEYDOWN and event.key == K_a:  # presses A
                 player.is_moving_left = True
@@ -194,15 +202,17 @@ def game():
             elif event.type == KEYDOWN and event.key == K_e:
                 spawn_enemy()
 
-        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(PLAYER_SCORE), BLACK)
+        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(PLAYER_SCORE), (255,255,255))
 
         # I dont think we need both flip() and update(). I think they do the same thing when you call with no arguments
         pygame.display.flip()
         pygame.display.update()
 
         # increment clock. Call at very end of game loop, once per iteration
+        
         FPSCLOCK.tick(FPS)
 
+    #gameover();
 
 def welcome():
     red = (255, 0, 0)
@@ -213,7 +223,6 @@ def welcome():
             if event.type == MOUSEBUTTONDOWN:
                 load_game = True
         pygame.display.flip()
-
 
 def main():
     welcome()

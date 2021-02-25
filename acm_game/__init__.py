@@ -2,6 +2,7 @@
 
 import pygame
 import random
+import math
 
 
 class GameObject:
@@ -109,11 +110,11 @@ class Player(GameObject):
     def draw(self):
         self.surface.blit(self.image, self.rect.topleft)
 
-    def shoot(self, bullets_list):
+    def shoot(self, target_x, target_y, bullets_list):
         # TODO: is there a more elegant way to do this than passing in the bullets list?
         x = self.rect.centerx
         y = self.rect.centery - 40
-        bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface)
+        bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface, target_x, target_y)
         bullets_list.append(bullet)
 
 
@@ -168,14 +169,19 @@ class Bullet(GameObject):
     is_exploding = False
     is_finished_exploding = False
 
-    def __init__(self, rect, surface, movement_speed=10):
+    def __init__(self, rect, surface, target_x, target_y, movement_speed=10):
         super().__init__(rect, surface, movement_speed)
+        self.x_movement_value = 0
+        self.y_movement_value = 0
+        self.calculate_movement_values(target_x, target_y)
 
     def __str__(self):
         return "bullet"
 
     def move(self):
-        self.rect.centery -= self.movement_speed
+
+        self.rect.centerx += self.x_movement_value
+        self.rect.centery += self.y_movement_value
 
     def explode(self):
         # "magic number" 9 is the number of explosion images in the folder
@@ -196,3 +202,39 @@ class Bullet(GameObject):
 
     def get_explosion_path(self):
         return f'assets/explosion/explosion{self.explosion_counter}.png'
+
+    def calculate_movement_values(self, target_x, target_y):
+
+        delta_y = target_y - self.rect.centery
+        delta_x = target_x - self.rect.centerx
+
+        if delta_x != 0:
+
+            movement_angle = math.atan(abs(delta_y) / abs(delta_x))
+            x_movement = self.movement_speed * math.cos(movement_angle)
+            y_movement = self.movement_speed * math.sin(movement_angle)
+
+            if delta_x > 0:
+                # target to the right, movement value is positive
+                self.x_movement_value = x_movement
+            else:
+                # target to the left, movement value is negative
+                self.x_movement_value = x_movement * -1
+
+            if delta_y > 0:
+                # target below player, move down
+                self.y_movement_value = y_movement
+            else:
+                # target above player, move up
+                self.y_movement_value = y_movement * -1
+
+        else:
+            # avoid division by zero
+            # target directly above or below player
+            self.x_movement_value = 0
+            if delta_y <= 0:
+                # target above player
+                self.y_movement_value = self.movement_speed
+            else:
+                # target below player
+                self.y_movement_value = self.movement_speed * -1
