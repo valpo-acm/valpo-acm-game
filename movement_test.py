@@ -77,6 +77,16 @@ def spawn_enemy_wave(num_prev_waves, player_score, player_hp):
         spawn_enemy()
 
 
+def scrollY(screenSurf, offsetY):
+    width, height = screenSurf.get_size()
+    copySurf = screenSurf.copy()
+    screenSurf.blit(copySurf, (0, offsetY))
+    if offsetY < 0:
+        screenSurf.blit(copySurf, (0, height + offsetY), (0, 0, width, -offsetY))
+    else:
+        screenSurf.blit(copySurf, (0, 0), (0, height - offsetY, width, offsetY))
+
+
 def game():
     global FPSCLOCK
     global NUM_WAVES
@@ -96,6 +106,7 @@ def game():
     player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 125, 80), DISPLAYSURF, player_img)
 
     bullets = []
+    scroll = 0  #scrolling
     # main game loop
     while True:
         # Current Order:
@@ -104,13 +115,14 @@ def game():
         # - animate enemies
         #   - determine if enimies go off screen; remove if they do
         #   - determine if there are any collisions; remove hp if there are any; also remove enemy
-        # - animate bullets
-        # - respond to user events
+        # - animate bulletsa
         # - update display
         # - update the clock
 
         # set background color
         DISPLAYSURF.blit(background_img, (0,0))
+        scrollY(DISPLAYSURF, scroll)
+        scroll = (scroll + 2)%WINDOW_HEIGHT
         # create a player surface, and rotate the player image the appropriate number of degrees
         # player_angle = 0
         # PLAYER_SURF = pygame.transform.rotate(player_img, player_angle)
@@ -177,8 +189,7 @@ def game():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-
-            elif event.type == MOUSEBUTTONDOWN:  # user clicks mouse
+            elif event.type == MOUSEBUTTONDOWN:  # user releases spacebar
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 player.shoot(mouse_x, mouse_y, bullets)
                 laser_sound.play()
