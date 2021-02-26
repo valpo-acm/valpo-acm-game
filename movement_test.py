@@ -17,8 +17,8 @@ FPS = 60
 
 NUM_WAVES = 0
 
-WINDOW_HEIGHT = 600
-WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 800
+WINDOW_WIDTH = 600
 
 DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 
@@ -28,7 +28,7 @@ PLAYER_SCORE = 0
 
 player_img = pygame.image.load('assets/player.png')
 enemy_img = pygame.image.load('assets/enemy.png')
-
+background_img = pygame.image.load('assets/background.png')
 
 # Current TODO:
 # - have the player angle impact the distance travelled
@@ -96,10 +96,8 @@ def game():
     player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 125, 80), DISPLAYSURF, player_img)
 
     bullets = []
-
     # main game loop
     while True:
-
         # Current Order:
         # - fill backround
         # - animate player
@@ -112,7 +110,7 @@ def game():
         # - update the clock
 
         # set background color
-        DISPLAYSURF.fill(BG)
+        DISPLAYSURF.blit(background_img, (0,0))
         # create a player surface, and rotate the player image the appropriate number of degrees
         # player_angle = 0
         # PLAYER_SURF = pygame.transform.rotate(player_img, player_angle)
@@ -179,7 +177,8 @@ def game():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == KEYUP and event.key == K_SPACE:  # user releases spacebar
+
+            elif event.type == MOUSEBUTTONDOWN:  # user clicks mouse
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 player.shoot(mouse_x, mouse_y, bullets)
                 laser_sound.play()
@@ -204,17 +203,17 @@ def game():
             elif event.type == KEYDOWN and event.key == K_e:
                 spawn_enemy()
 
-        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(PLAYER_SCORE), BLACK)
+        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(PLAYER_SCORE), (255,255,255))
 
         # I dont think we need both flip() and update(). I think they do the same thing when you call with no arguments
         pygame.display.flip()
         pygame.display.update()
 
         # increment clock. Call at very end of game loop, once per iteration
+        
         FPSCLOCK.tick(FPS)
 
     #gameover();
-
 
 def welcome():
     red = (255, 0, 0)
@@ -225,7 +224,6 @@ def welcome():
             if event.type == MOUSEBUTTONDOWN:
                 load_game = True
         pygame.display.flip()
-
 
 def main():
     welcome()
