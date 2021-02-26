@@ -177,7 +177,8 @@ def game():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == MOUSEBUTTONDOWN:  # user releases spacebar
+
+            elif event.type == MOUSEBUTTONDOWN:  # user clicks mouse
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 player.shoot(mouse_x, mouse_y, bullets)
                 laser_sound.play()
