@@ -29,6 +29,7 @@ PLAYER_SCORE = 0
 player_img = pygame.image.load('assets/player.png')
 enemy_img = pygame.image.load('assets/enemy.png')
 background_img = pygame.image.load('assets/background.png')
+title_img = pygame.image.load('assets/title.png')
 
 # Current TODO:
 # - have the player angle impact the distance travelled
@@ -227,10 +228,13 @@ def game():
     #gameover();
 
 def welcome():
-    red = (255, 0, 0)
     load_game = False
+    scroll = 0
     while (not load_game):
-        DISPLAYSURF.fill(red)
+        DISPLAYSURF.blit(background_img, (0,0))
+        scrollY(DISPLAYSURF, scroll)
+        scroll = (scroll + 2)%WINDOW_HEIGHT
+        DISPLAYSURF.blit(title_img, (0,0))
         for event in pygame.event.get():
             if event.type == MOUSEBUTTONDOWN:
                 load_game = True
@@ -239,7 +243,6 @@ def welcome():
 def main():
     welcome()
     game()
-
 
 if __name__ == '__main__':
     main()
