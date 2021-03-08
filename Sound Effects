@@ -1,1 +1,19 @@
+pygame.init()
+pygame.font.init()
+pygame.mixer.init()
 
+s = 'sound' #defined the sound 
+
+hit = pygame.mixer.Sound(os.path.join(s, 'hit.ogg'))
+
+for enemy in enemy_hit_list:
+    pygame.mixer.Sound.play(hit)
+    
+# while loop for the background music
+# we could also have it set up to play during the whole time
+
+background = pygame.mixer.music.load(os.path.join(s, 'music.ogg'))
+
+pygame.mixer.music.play(-1)
+# -1 tels you to keep looping the music file infinitely. 
+# 0 will set the music to stop and the music will not play in the background
