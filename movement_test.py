@@ -26,10 +26,12 @@ ENEMIES = []
 
 PLAYER_SCORE = 0
 
+# load image and sound files from filepath strings
 player_img = pygame.image.load('assets/player.png')
 enemy_img = pygame.image.load('assets/enemy.png')
 background_img = pygame.image.load('assets/background.png')
 title_img = pygame.image.load('assets/title.png')
+laser_sound = pygame.mixer.Sound('assets/laser-gun-19sf.wav')
 
 # Current TODO:
 # - have the player angle impact the distance travelled
@@ -99,9 +101,6 @@ def game():
     # set up window
     DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
     pygame.display.set_caption("WASD to move. Space to Shoot")
-
-    # load image and sound files from filepath strings
-    laser_sound = pygame.mixer.Sound('assets/laser-gun-19sf.mp3')
 
     # create player object with initial location. Size is approximate based on image file
     player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 125, 80), DISPLAYSURF, player_img)
