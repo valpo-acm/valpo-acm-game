@@ -1,0 +1,23 @@
+#
+# Valpo ACM Game config.yaml
+#
+
+bg: [255, 255, 255]
+black: [0, 0, 0]
+
+fps: 60
+
+waves: 0
+
+font:
+        style: "Comic Sans MS"
+        size: 50
+
+# File paths to various assets. Python will automatically get the absolute file path of the containing directory of movement_test.py
+assets:
+        player: "assets/player.png"
+        enemy: "assets/enemy.png"
+        background: "assets/background.png"
+        title: "assets/title.png"
+        gameover: "assets/gameover.png"
+        laser: "assets/laser-gun-19sf.wav"

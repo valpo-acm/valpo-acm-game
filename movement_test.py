@@ -2,20 +2,12 @@ import pygame
 import sys
 from pygame.locals import *
 from acm_game import *
+from pathlib import Path
 import random
 import pygame.freetype
+import yaml
 
 pygame.init()
-scoreboardFont = pygame.freetype.SysFont('Comic Sans MS', 50, bold=True)
-
-# RGB values
-BG = (255, 255, 255)
-BLACK = (0, 0, 0)
-
-# frames per second
-FPS = 60
-
-NUM_WAVES = 0
 
 WINDOW_HEIGHT = 800
 WINDOW_WIDTH = 600
@@ -26,19 +18,40 @@ ENEMIES = []
 
 PLAYER_SCORE = 0
 
+# Absolute path of the folder that contains this file.
+PATH = str(Path(__file__).parent.absolute()) + "/"
+
 # load image and sound files from filepath strings
-player_img = pygame.image.load('assets/player.png')
-enemy_img = pygame.image.load('assets/enemy.png')
-background_img = pygame.image.load('assets/background.png')
-title_img = pygame.image.load('assets/title.png')
-laser_sound = pygame.mixer.Sound('assets/laser-gun-19sf.wav')
+def loadconfig():
+    global BG, BLACK, FPS, NUM_WAVES, scoreboardFont, player_img, enemy_img, background_img, title_img, gameover_img, laser_sound
+    
+    # Open and close the config file safely.
+    with open(PATH + '/config.yaml') as file:
+        config = yaml.safe_load(file)
+
+        # RGB values
+        BG = config['bg']
+        BLACK = config['black']
+
+        # frames per second
+        FPS = config['fps']
+
+        NUM_WAVES = config['waves'] 
+
+        scoreboardFont = pygame.freetype.SysFont(config['font']['style'], config['font']['size'], bold=True)
+
+        player_img = pygame.image.load(PATH + config['assets']['player'])
+        enemy_img = pygame.image.load(PATH + config['assets']['enemy'])
+        background_img = pygame.image.load(PATH + config['assets']['background'])
+        title_img = pygame.image.load(PATH + config['assets']['title'])
+        gameover_img = pygame.image.load(PATH + config['assets']['gameover'])
+        laser_sound = pygame.mixer.Sound(PATH + config['assets']['laser'])
 
 # Current TODO:
 # - have the player angle impact the distance travelled
 # - use the current mouse position to set the player angle
 
 def gameover():
-    gameover_img = pygame.image.load('assets/gameover.png')
     DISPLAYSURF.fill(BLACK)
     DISPLAYSURF.blit(gameover_img, (0,0))
 
@@ -224,8 +237,6 @@ def game():
         
         FPSCLOCK.tick(FPS)
 
-    #gameover();
-
 def welcome():
     load_game = False
     scroll = 0
@@ -240,6 +251,7 @@ def welcome():
         pygame.display.flip()
 
 def main():
+    loadconfig()
     welcome()
     game()
 
