@@ -169,7 +169,7 @@ class Bullet(GameObject):
     is_exploding = False
     is_finished_exploding = False
 
-    def __init__(self, rect, surface, target_x, target_y, movement_speed=10):
+    def __init__(self, rect, surface, target_x, target_y, movement_speed=15):
         super().__init__(rect, surface, movement_speed, color=(255, 255, 255))
         self.x_movement_value = 0
         self.y_movement_value = 0
