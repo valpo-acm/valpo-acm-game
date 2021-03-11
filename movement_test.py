@@ -40,12 +40,16 @@ def loadconfig():
 
         scoreboardFont = pygame.freetype.SysFont(config['font']['style'], config['font']['size'], bold=True)
 
-        player_img = pygame.image.load(PATH + config['assets']['player'])
-        enemy_img = pygame.image.load(PATH + config['assets']['enemy'])
-        background_img = pygame.image.load(PATH + config['assets']['background'])
-        title_img = pygame.image.load(PATH + config['assets']['title'])
-        gameover_img = pygame.image.load(PATH + config['assets']['gameover'])
-        laser_sound = pygame.mixer.Sound(PATH + config['assets']['laser'])
+        assets = config['assets']
+
+        player_img = pygame.image.load(PATH + assets['player'])
+        enemy_img = pygame.image.load(PATH + assets['enemy'])
+        background_img = pygame.image.load(PATH + assets['background'])
+        title_img = pygame.image.load(PATH + assets['title'])
+        gameover_img = pygame.image.load(PATH + assets['gameover'])
+        laser_sound = pygame.mixer.Sound(PATH + assets['laser'])
+
+        laser_sound.set_volume(config['volume']/100)
 
 # Current TODO:
 # - have the player angle impact the distance travelled
@@ -202,7 +206,7 @@ def game():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == MOUSEBUTTONDOWN:  # user releases spacebar
+            elif event.type == MOUSEBUTTONDOWN:  # presses mouse button
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 player.shoot(mouse_x, mouse_y, bullets)
                 laser_sound.play()

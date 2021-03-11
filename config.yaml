@@ -5,10 +5,21 @@
 bg: [255, 255, 255]
 black: [0, 0, 0]
 
+# frames per second
 fps: 60
 
+# Change starting wave size
+# (Default: 0)
 waves: 0
 
+# Modify volume percentage. 
+# (Default: 100)
+volume: 100
+
+# Font used for the score in the corner.
+# (Default: 
+#       style: "Comic Sans MS" 
+#       size: 50)
 font:
         style: "Comic Sans MS"
         size: 50
