@@ -1,3 +1,5 @@
+#!/usr/bin/python3.9
+
 import pygame
 import sys
 from pygame.locals import *
@@ -26,7 +28,7 @@ def loadconfig():
     global BG, BLACK, FPS, NUM_WAVES, scoreboardFont, player_img, enemy_img, background_img, title_img, gameover_img, laser_sound
     
     # Open and close the config file safely.
-    with open(PATH + '/config.yaml') as file:
+    with open(PATH + '/config.yaml', 'r') as file:
         config = yaml.safe_load(file)
 
         # RGB values
@@ -56,8 +58,21 @@ def loadconfig():
 # - use the current mouse position to set the player angle
 
 def gameover():
-    DISPLAYSURF.fill(BLACK)
-    DISPLAYSURF.blit(gameover_img, (0,0))
+    scroll = 0
+    finished = False
+
+    while (not finished):
+        scrollY(DISPLAYSURF, scroll)
+        scroll = (scroll + 2)%WINDOW_HEIGHT
+
+        DISPLAYSURF.fill(BLACK)
+        DISPLAYSURF.blit(gameover_img, (0,0))
+
+        for event in pygame.event.get():
+            if event.type == QUIT: # quit game if user presses close on welcome screen
+                pygame.quit()
+                sys.exit()
+        pygame.display.flip()
 
 
 def spawn_enemy():
@@ -121,11 +136,12 @@ def game():
 
     # create player object with initial location. Size is approximate based on image file
     player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 125, 80), DISPLAYSURF, player_img)
+    alive = True
 
     bullets = []
     scroll = 0  #scrolling
     # main game loop
-    while True:
+    while alive:
         # Current Order:
         # - fill backround
         # - animate player
@@ -172,7 +188,7 @@ def game():
                 if player.hitpoints < 1:
                     # GAME OVER!
                     # TODO add GAME OVER screen
-                    #gameover()
+                    alive = False
                     pass
                 ENEMIES.remove(enemy)
 
@@ -206,7 +222,7 @@ def game():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == MOUSEBUTTONDOWN:  # presses mouse button
+            elif event.type == MOUSEBUTTONDOWN or (event.type == KEYDOWN and event.key == K_SPACE):  # presses mouse button or press space
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 player.shoot(mouse_x, mouse_y, bullets)
                 laser_sound.play()
@@ -252,12 +268,17 @@ def welcome():
         for event in pygame.event.get():
             if event.type == MOUSEBUTTONDOWN:
                 load_game = True
+
+        if event.type == QUIT: # quit game if user presses close on welcome screen
+            pygame.quit()
+            sys.exit()
         pygame.display.flip()
 
 def main():
     loadconfig()
     welcome()
     game()
+    gameover()
 
 if __name__ == '__main__':
     main()
