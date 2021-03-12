@@ -23,12 +23,12 @@ PLAYER_SCORE = 0
 # Absolute path of the folder that contains this file.
 PATH = str(Path(__file__).parent.absolute()) + "/"
 
-# load image and sound files from filepath strings
+# load image and sound files from filepath strings, also load data
 def loadconfig():
-    global BG, BLACK, FPS, NUM_WAVES, scoreboardFont, player_img, enemy_img, background_img, title_img, gameover_img, laser_sound
+    global BG, BLACK, FPS, NUM_WAVES, scoreboardFont, player_img, enemy_img, background_img, title_img, gameover_img, laser_sound, data
     
     # Open and close the config file safely.
-    with open(PATH + '/config.yaml', 'r') as file:
+    with open(PATH + 'config.yaml', 'r') as file:
         config = yaml.safe_load(file)
 
         # RGB values
@@ -53,6 +53,20 @@ def loadconfig():
 
         laser_sound.set_volume(config['volume']/100)
 
+    # Load data file from long term storage
+    if Path(PATH + 'data.yaml').is_file():
+        with open(PATH + 'data.yaml', 'r') as file:
+            data = yaml.safe_load(file)
+    else:
+        # Default Data:
+        data = {}
+        data['high_score'] = 0;
+
+# Save all scores in data[] to data.yaml
+def save_data():
+    with open(PATH + 'data.yaml', 'w') as file:
+        yaml.dump(data, file)
+
 # Current TODO:
 # - have the player angle impact the distance travelled
 # - use the current mouse position to set the player angle
@@ -60,6 +74,11 @@ def loadconfig():
 def gameover():
     scroll = 0
     finished = False
+
+    if(data['high_score'] < PLAYER_SCORE):
+        data['high_score'] = PLAYER_SCORE
+        save_data()
+        print(f"New High Score of: {PLAYER_SCORE}!")
 
     while (not finished):
         scrollY(DISPLAYSURF, scroll)
@@ -73,7 +92,6 @@ def gameover():
                 pygame.quit()
                 sys.exit()
         pygame.display.flip()
-
 
 def spawn_enemy():
     direction = random.choice(["diagonal", "down"])
@@ -168,7 +186,7 @@ def game():
         if FPSCLOCK.get_time() % 16 == 0:
             # check if we start a wave
             if is_wave(len(ENEMIES)):
-                print("Spawning Enemy Wave")
+                print(f"Spawning Enemy Wave: {NUM_WAVES}")
                 spawn_enemy_wave(NUM_WAVES, 0, 0)
                 NUM_WAVES += 1
 
@@ -187,7 +205,6 @@ def game():
                 print(f"Hitpoints: {player.hitpoints}")
                 if player.hitpoints < 1:
                     # GAME OVER!
-                    # TODO add GAME OVER screen
                     alive = False
                     pass
                 ENEMIES.remove(enemy)
