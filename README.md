@@ -5,6 +5,7 @@ The top down shooter game that Valpo ACM-W is building together. Licensed under 
 * player moving forward, backward, left, and right
 
 Requirments- 3.9 Python
+pyyaml
 
 Check Assets
 
