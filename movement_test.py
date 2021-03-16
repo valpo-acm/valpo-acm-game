@@ -26,7 +26,7 @@ PATH = str(Path(__file__).parent.absolute()) + "/"
 # load image and sound files from filepath strings, also load data
 def loadconfig():
     global BG, BLACK, FPS, NUM_WAVES, scoreboardFont, player_img, enemy_img, background_img, title_img, gameover_img, laser_sound, data
-    
+
     # Open and close the config file safely.
     with open(PATH + 'config.yaml', 'r') as file:
         config = yaml.safe_load(file)
@@ -38,7 +38,7 @@ def loadconfig():
         # frames per second
         FPS = config['fps']
 
-        NUM_WAVES = config['waves'] 
+        NUM_WAVES = config['waves']
 
         scoreboardFont = pygame.freetype.SysFont(config['font']['style'], config['font']['size'], bold=True)
 
@@ -162,11 +162,15 @@ def game():
     while alive:
         # Current Order:
         # - fill backround
+        # - handle scrolling
+        # - start a wave if we need to
         # - animate player
-        # - animate enemies
-        #   - determine if enimies go off screen; remove if they do
-        #   - determine if there are any collisions; remove hp if there are any; also remove enemy
-        # - animate bulletsa
+        # - animate bullets
+        #   - animate enemies
+        #       - determine if enimies go off screen; remove if they do
+        #       - determine if there are any collisions; remove hp if there are any; also remove enemy
+        #       - check if hp is 0; if so, end game
+        # - check for user events
         # - update display
         # - update the clock
 
@@ -271,7 +275,7 @@ def game():
         pygame.display.update()
 
         # increment clock. Call at very end of game loop, once per iteration
-        
+
         FPSCLOCK.tick(FPS)
 
 def welcome():
