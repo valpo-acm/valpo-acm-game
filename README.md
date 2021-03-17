@@ -9,11 +9,9 @@ something like this though:
 
 TODO:
 
-[ ] - have music running in the background
-
-[ ] - have enemies rotate their angle while they move to look more natural
-
-[ ] - have different types of enemies (bosses)
+- [ ]  have music running in the background
+- [ ]  have enemies rotate their angle while they move to look more natural
+- [ ]  have different types of enemies (bosses)
 
 
 # Requirments
