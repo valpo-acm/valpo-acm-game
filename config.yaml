@@ -24,11 +24,22 @@ font:
         style: "Comic Sans MS"
         size: 50
 
+# How frequently and the maximum amount of player health modules that spawn in a wave.
+health: #TODO: this does nothing yet.
+        frequency: 2
+        max_per_wave: 4
+
+# How frequently should a boss wave occur. TODO: This does nothing yet.
+bosswave: 5
+
 # File paths to various assets. Python will automatically get the absolute file path of the containing directory of movement_test.py
 assets:
         player: "assets/player.png"
         enemy: "assets/enemy.png"
+        health: "assets/heart.png" # TODO: Doesn't exist yet.
         background: "assets/background.png"
         title: "assets/title.png"
         gameover: "assets/gameover.png"
         laser: "assets/laser-gun-19sf.wav"
+        hit: "assets/hit.wav" # TODO: hit sounds and music not yet used
+        music: "assets/music.wav"

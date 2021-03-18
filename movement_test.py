@@ -25,7 +25,7 @@ PATH = str(Path(__file__).parent.absolute()) + "/"
 
 # load image and sound files from filepath strings, also load data
 def loadconfig():
-    global BG, BLACK, FPS, NUM_WAVES, scoreboardFont, player_img, enemy_img, background_img, title_img, gameover_img, laser_sound, data
+    global BG, BLACK, FPS, NUM_WAVES, scoreboardFont, player_img, enemy_img, background_img, title_img, gameover_img, laser_sound, hit, music, data
 
     # Open and close the config file safely.
     with open(PATH + 'config.yaml', 'r') as file:
@@ -50,6 +50,8 @@ def loadconfig():
         title_img = pygame.image.load(PATH + assets['title'])
         gameover_img = pygame.image.load(PATH + assets['gameover'])
         laser_sound = pygame.mixer.Sound(PATH + assets['laser'])
+        #hit = pygame.mixer.Sound(PATH + assets['hit'])
+        #music = pygame.mixer.music.load(PATH + assets['music']) TODO: Not added yet
 
         laser_sound.set_volume(config['volume']/100)
 
@@ -75,7 +77,7 @@ def gameover():
     scroll = 0
     finished = False
 
-    if(data['high_score'] < PLAYER_SCORE):
+    if data['high_score'] < PLAYER_SCORE:
         data['high_score'] = PLAYER_SCORE
         save_data()
         print(f"New High Score of: {PLAYER_SCORE}!")
