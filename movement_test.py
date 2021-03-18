@@ -17,6 +17,7 @@ WINDOW_WIDTH = 600
 DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 
 ENEMIES = []
+HEALTHMODULES = []
 
 PLAYER_SCORE = 0
 
@@ -25,7 +26,7 @@ PATH = str(Path(__file__).parent.absolute()) + "/"
 
 # load image and sound files from filepath strings, also load data
 def loadconfig():
-    global BG, BLACK, FPS, NUM_WAVES, scoreboardFont, player_img, enemy_img, background_img, title_img, gameover_img, laser_sound, hit, music, data
+    global BG, BLACK, FPS, NUM_WAVES, HEALTH_FREQUENCY, MAX_HEALTH, scoreboardFont, player_img, enemy_img, background_img, title_img, gameover_img, health_img, laser_sound, hit, music, data
 
     # Open and close the config file safely.
     with open(PATH + 'config.yaml', 'r') as file:
@@ -39,6 +40,8 @@ def loadconfig():
         FPS = config['fps']
 
         NUM_WAVES = config['waves']
+        HEALTH_FREQUENCY = config['health']
+        MAX_HEALTH = config['maxhealth']
 
         scoreboardFont = pygame.freetype.SysFont(config['font']['style'], config['font']['size'], bold=True)
 
@@ -49,6 +52,7 @@ def loadconfig():
         background_img = pygame.image.load(PATH + assets['background'])
         title_img = pygame.image.load(PATH + assets['title'])
         gameover_img = pygame.image.load(PATH + assets['gameover'])
+        health_img = pygame.image.load(PATH + assets['health'])
         laser_sound = pygame.mixer.Sound(PATH + assets['laser'])
         #hit = pygame.mixer.Sound(PATH + assets['hit'])
         #music = pygame.mixer.music.load(PATH + assets['music']) TODO: Not added yet
@@ -93,13 +97,14 @@ def gameover():
         DISPLAYSURF.blit(gameover_img, (0,0))
 
         if new_highscore:
-            scoreboardFont.render_to(DISPLAYSURF, (60, 400), f'New Highscore! {PLAYER_SCORE}', (255,255,255))
+            scoreboardFont.render_to(DISPLAYSURF, (60, WINDOW_HEIGHT/2), f'New Highscore! {PLAYER_SCORE}', (255,255,255))
 
         for event in pygame.event.get():
             if event.type == QUIT: # quit game if user presses close on welcome screen
                 pygame.quit()
                 sys.exit()
         pygame.display.flip()
+
 
 def spawn_enemy():
     direction = random.choice(["diagonal", "down"])
@@ -119,6 +124,16 @@ def spawn_enemy():
             # spawned on right side of screen
             enemy.is_moving_left = True
     ENEMIES.append(enemy)
+
+
+def spawn_health():
+    speed = random.choice(range(4, 8))
+    w = 50 + random.choice(range(WINDOW_WIDTH - 100)) # spawn the health so it is not partially off screen
+
+    health = HealthModule(pygame.Rect(w, -80, 30, 30), DISPLAYSURF, health_img, speed) # the rectangle size needs to be adjusted
+    health.is_moving_down = True
+
+    HEALTHMODULES.append(health)
 
 
 # function to calculate if there should be a new wave
@@ -202,6 +217,9 @@ def game():
                 spawn_enemy_wave(NUM_WAVES, 0, 0)
                 NUM_WAVES += 1
 
+                if NUM_WAVES % HEALTH_FREQUENCY == 0:
+                    spawn_health()
+
         player.animate()
 
         for enemy in ENEMIES:
@@ -245,6 +263,20 @@ def game():
                     if enemy.hitpoints < 1:
                         ENEMIES.remove(enemy)
                         PLAYER_SCORE += 1
+            for health in HEALTHMODULES:
+                if bullet.did_collide_with(health) and bullet.is_exploding is False:
+                    bullet.is_exploding = True
+                    health.hitpoints -= 1
+                    HEALTHMODULES.remove(health)
+
+        for health in HEALTHMODULES:
+            health.animate()
+            if health.rect.centery > WINDOW_HEIGHT:
+                HEALTHMODULES.remove(health)
+            elif health.did_collide_with(player):
+                if player.hitpoints < MAX_HEALTH:
+                    player.hitpoints += 1
+                HEALTHMODULES.remove(health)
 
         # respond to user input events
         for event in pygame.event.get():
@@ -285,8 +317,8 @@ def game():
         pygame.display.update()
 
         # increment clock. Call at very end of game loop, once per iteration
-
         FPSCLOCK.tick(FPS)
+
 
 def welcome():
     load_game = False
@@ -304,6 +336,7 @@ def welcome():
             pygame.quit()
             sys.exit()
         pygame.display.flip()
+
 
 def main():
     loadconfig()

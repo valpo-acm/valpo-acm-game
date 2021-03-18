@@ -163,6 +163,18 @@ class Enemy(GameObject):
                 self.is_moving_left = False
                 self.is_moving_right = False
 
+class HealthModule(GameObject):
+    hitpoints = 1
+
+    def __init__(self, rect, surface, image, movement_speed=1):
+        super().__init__(rect, surface, movement_speed)
+        self.image = image
+
+    def __str__(self):
+        return "health"
+
+    def draw(self):
+        self.surface.blit(self.image, self.rect.topleft)
 
 class Bullet(GameObject):
     explosion_counter = 0
