@@ -77,10 +77,13 @@ def gameover():
     scroll = 0
     finished = False
 
+    new_highscore = False
+
     if data['high_score'] < PLAYER_SCORE:
         data['high_score'] = PLAYER_SCORE
         save_data()
         print(f"New High Score of: {PLAYER_SCORE}!")
+        new_highscore = True
 
     while (not finished):
         scrollY(DISPLAYSURF, scroll)
@@ -88,6 +91,9 @@ def gameover():
 
         DISPLAYSURF.fill(BLACK)
         DISPLAYSURF.blit(gameover_img, (0,0))
+
+        if new_highscore:
+            scoreboardFont.render_to(DISPLAYSURF, (60, 400), f'New Highscore! {PLAYER_SCORE}', (255,255,255))
 
         for event in pygame.event.get():
             if event.type == QUIT: # quit game if user presses close on welcome screen
@@ -271,6 +277,7 @@ def game():
                 spawn_enemy()
 
         scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(PLAYER_SCORE), (255,255,255))
+        scoreboardFont.render_to(DISPLAYSURF, (30, 100), str(player.hitpoints), (255, 0, 0))
         scoreboardFont.render_to(DISPLAYSURF, (WINDOW_WIDTH * .6, 30), "Best: " + str(data['high_score']), (255,255,0))
 
         # I dont think we need both flip() and update(). I think they do the same thing when you call with no arguments
