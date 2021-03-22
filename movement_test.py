@@ -113,7 +113,7 @@ def spawn_enemy():
     # h = random.choice(range(WINDOW_HEIGHT))
 
     # enemy spawns just off the top of the screen, so we don't see them pop into existence
-    enemy = Enemy(pygame.Rect(w, -80, 75, 75), DISPLAYSURF, enemy_img, speed)
+    enemy = Enemy(pygame.Rect(w, -80, 100, 105), DISPLAYSURF, enemy_img, speed)
     enemy.is_moving_down = True
     # add left/right movement 1/2 of the time
     if direction == "diagonal":
@@ -130,7 +130,7 @@ def spawn_health():
     speed = random.choice(range(4, 8))
     w = 50 + random.choice(range(WINDOW_WIDTH - 100)) # spawn the health so it is not partially off screen
 
-    health = HealthModule(pygame.Rect(w, -80, 30, 30), DISPLAYSURF, health_img, speed) # the rectangle size needs to be adjusted
+    health = HealthModule(pygame.Rect(w, -80, 75, 75), DISPLAYSURF, health_img, speed) # the rectangle size needs to be adjusted
     health.is_moving_down = True
 
     HEALTHMODULES.append(health)
@@ -176,8 +176,10 @@ def game():
     pygame.display.set_caption("WASD to move. Space to Shoot")
 
     # create player object with initial location. Size is approximate based on image file
-    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 125, 80), DISPLAYSURF, player_img)
+    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 100, 130), DISPLAYSURF, player_img)
     alive = True
+
+    showhitboxes = False
 
     bullets = []
     scroll = 0  #scrolling
@@ -222,8 +224,13 @@ def game():
 
         player.animate()
 
+        if showhitboxes:
+            pygame.draw.rect(DISPLAYSURF, (0, 255, 0), player.rect)
+
         for enemy in ENEMIES:
             enemy.animate()
+            if showhitboxes:
+                pygame.draw.rect(DISPLAYSURF, (0, 0, 255), enemy.rect)
             for other_enemy in ENEMIES:
                 enemy.bounce_off(other_enemy)
             if enemy.rect.centery > WINDOW_HEIGHT:
@@ -271,6 +278,8 @@ def game():
 
         for health in HEALTHMODULES:
             health.animate()
+            if showhitboxes:
+                pygame.draw.rect(DISPLAYSURF, (255, 0, 0), health.rect)
             if health.rect.centery > WINDOW_HEIGHT:
                 HEALTHMODULES.remove(health)
             elif health.did_collide_with(player):
@@ -307,6 +316,10 @@ def game():
             # temporary testing line
             elif event.type == KEYDOWN and event.key == K_e:
                 spawn_enemy()
+            elif event.type == KEYDOWN and event.key == K_h:
+                spawn_health()
+            elif event.type == KEYDOWN and event.key == K_b:
+                showhitboxes = not showhitboxes
 
         scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(PLAYER_SCORE), (255,255,255))
         scoreboardFont.render_to(DISPLAYSURF, (30, 100), str(player.hitpoints), (255, 0, 0))

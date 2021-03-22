@@ -37,8 +37,8 @@ bosswave: 5
 
 # File paths to various assets. Python will automatically get the absolute file path of the containing directory of movement_test.py
 assets:
-        player: "assets/player.png"
-        enemy: "assets/enemy.png"
+        player: "assets/player-left.png"
+        enemy: "assets/enemy-left.png"
         health: "assets/health.png"
         background: "assets/background.png"
         title: "assets/title.png"
