@@ -118,21 +118,21 @@ class Player(GameObject):
         bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface, target_x, target_y)
         bullets_list.append(bullet)
 
-    def isAlive():
-        if hitpoints < 1:
+    def isAlive(self):
+        if self.hitpoints < 1:
             return False
         return True
 
-    def get_score():
+    def get_score(self):
         return self.score
 
-    def set_score(score):
+    def set_score(self, score):
         self.score = score
 
-    def score_plus(val):
+    def score_plus(self, val):
         self.score = self.score + val
 
-    def score_minus(val):
+    def score_minus(self, val):
         self.score = self.score - val
 
 #TODO: add in a constructor that can take an 'enemy type' like
