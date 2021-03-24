@@ -16,8 +16,6 @@ WINDOW_WIDTH = 600
 
 DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 
-HEALTHMODULES = []
-
 # Absolute path of the folder that contains this file.
 PATH = str(Path(__file__).parent.absolute()) + "/"
 
@@ -120,12 +118,12 @@ def game():
     # Create clock object
     FPSCLOCK = pygame.time.Clock()
     # set up window
-    DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
+    GAMESURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
     pygame.display.set_caption("WASD to move. Space to Shoot")
 
     # create player object with initial location. Size is approximate based on image file
-    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 100, 130), DISPLAYSURF, player_img)
-    GAME = Game(0, DISPLAYSURF, player)
+    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 100, 130), GAMESURF, player_img)
+    GAME = Game(0, GAMESURF, player)
     alive = True
 
     showhitboxes = False
@@ -148,8 +146,8 @@ def game():
         # - update the clock
 
         # set background color
-        DISPLAYSURF.blit(background_img, (0,0))
-        scrollY(GAME.DISPLAYSURF, scroll)
+        GAMESURF.blit(background_img, (0,0))
+        scrollY(GAMESURF, scroll)
         scroll = (scroll + 2)%WINDOW_HEIGHT
         # create a player surface, and rotate the player image the appropriate number of degrees
         # player_angle = 0
@@ -172,7 +170,7 @@ def game():
         GAME.PLAYER.animate()
 
         if showhitboxes:
-            pygame.draw.rect(DISPLAYSURF, (0, 255, 0), GAME.PLAYER.rect)
+            pygame.draw.rect(GAMESURF, (0, 255, 0), GAME.PLAYER.rect)
 
 
         for bullet in GAME.BULLETS:
@@ -202,7 +200,7 @@ def game():
                 else:
                     enemy.animate()
                     if showhitboxes:
-                        pygame.draw.rect(DISPLAYSURF, (0, 0, 255), enemy.rect)
+                        pygame.draw.rect(GAMESURF, (0, 0, 255), enemy.rect)
                     for other_enemy in GAME.ENEMIES:
                         enemy.bounce_off(other_enemy)
                     if enemy.rect.centery > WINDOW_HEIGHT:
@@ -224,7 +222,7 @@ def game():
                 else:
                     health.animate()
                     if showhitboxes:
-                        pygame.draw.rect(DISPLAYSURF, (255, 0, 0), health.rect)
+                        pygame.draw.rect(GAMESURF, (255, 0, 0), health.rect)
                     if health.rect.centery > WINDOW_HEIGHT:
                         GAME.HEALTHMODULES.remove(health)
                     elif health.did_collide_with(player):
@@ -266,9 +264,9 @@ def game():
             elif event.type == KEYDOWN and event.key == K_b:
                 showhitboxes = not showhitboxes
 
-        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(GAME.PLAYER.get_score()), (255,255,255))
-        scoreboardFont.render_to(DISPLAYSURF, (30, 100), str(GAME.PLAYER.hitpoints), (255, 0, 0))
-        scoreboardFont.render_to(DISPLAYSURF, (WINDOW_WIDTH * .6, 30), "Best: " + str(data['high_score']), (255,255,0))
+        scoreboardFont.render_to(GAMESURF, (30, 30), str(GAME.PLAYER.get_score()), (255,255,255))
+        scoreboardFont.render_to(GAMESURF, (30, 100), str(GAME.PLAYER.hitpoints), (255, 0, 0))
+        scoreboardFont.render_to(GAMESURF, (WINDOW_WIDTH * .6, 30), "Best: " + str(data['high_score']), (255,255,0))
 
         # I dont think we need both flip() and update(). I think they do the same thing when you call with no arguments
         pygame.display.flip()
@@ -347,7 +345,7 @@ class Game:
         enemy.is_moving_down = True
         # add left/right movement 1/2 of the time
         if direction == "diagonal":
-            if w <= WINDOW_WIDTH / 2:
+            if w <= self.WIDTH / 2:
                 # spawned on left half of screen
                 enemy.is_moving_right = True
             else:
