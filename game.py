@@ -16,7 +16,6 @@ WINDOW_WIDTH = 600
 
 DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 
-ENEMIES = []
 HEALTHMODULES = []
 
 # Absolute path of the folder that contains this file.
@@ -106,14 +105,6 @@ def gameover():
 
 
 
-def spawn_health():
-    speed = random.choice(range(4, 8))
-    w = 50 + random.choice(range(WINDOW_WIDTH - 100)) # spawn the health so it is not partially off screen
-
-    health = HealthModule(pygame.Rect(w, -80, 75, 75), DISPLAYSURF, health_img, speed) # the rectangle size needs to be adjusted
-    health.is_moving_down = True
-
-    HEALTHMODULES.append(health)
 
 
 # function to calculate if there should be a new wave
@@ -189,7 +180,7 @@ def game():
                 GAME.spawn_enemy_wave()
 
                 if GAME.NUM_WAVES % HEALTH_FREQUENCY == 0:
-                    spawn_health()
+                    GAME.spawn_health()
 
         GAME.PLAYER.animate()
 
@@ -237,22 +228,22 @@ def game():
                     if enemy.hitpoints < 1:
                         GAME.ENEMIES.remove(enemy)
                         GAME.PLAYER.score_plus(1)
-            for health in HEALTHMODULES:
+            for health in GAME.HEALTHMODULES:
                 if bullet.did_collide_with(health) and bullet.is_exploding is False:
                     bullet.is_exploding = True
                     health.hitpoints -= 1
-                    HEALTHMODULES.remove(health)
+                    GAME.HEALTHMODULES.remove(health)
 
-        for health in HEALTHMODULES:
+        for health in GAME.HEALTHMODULES:
             health.animate()
             if showhitboxes:
                 pygame.draw.rect(DISPLAYSURF, (255, 0, 0), health.rect)
             if health.rect.centery > WINDOW_HEIGHT:
-                HEALTHMODULES.remove(health)
+                GAME.HEALTHMODULES.remove(health)
             elif health.did_collide_with(player):
                 if GAME.PLAYER.hitpoints < MAX_HEALTH:
                     GAME.PLAYER.hitpoints += 1
-                HEALTHMODULES.remove(health)
+                GAME.HEALTHMODULES.remove(health)
 
         # respond to user input events
         for event in pygame.event.get():
@@ -334,11 +325,24 @@ class Game:
     DIFFICULTY = 0 # 0 for easy/default (to be implemented
     DISPLAYSURF = None
     NUM_WAVES = 0 # TODO: implement this in the code!!!
+    WIDTH = 0
+    HEIGHT = 0
 
     def __init__(self, difficulty, display_surface, player):
         self.DIFFICULTY = difficulty
         self.DISPLAYSURF = display_surface
         self.PLAYER = player
+        self.WIDTH = self.DISPLAYSURF.get_size()[0]
+        self.HEIGHT = self.DISPLAYSURF.get_size()[1]
+
+    def spawn_health(self):
+        speed = random.choice(range(4, 8))
+        w = 50 + random.choice(range(self.WIDTH - 100)) # spawn the health so it is not partially off screen
+
+        health = HealthModule(pygame.Rect(w, -80, 75, 75), self.DISPLAYSURF, health_img, speed) # the rectangle size needs to be adjusted
+        health.is_moving_down = True
+
+        self.HEALTHMODULES.append(health)
 
     def spawn_enemy(self):
         direction = random.choice(["diagonal", "down"])
