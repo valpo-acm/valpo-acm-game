@@ -103,18 +103,6 @@ def gameover():
         pygame.display.flip()
 
 
-
-
-
-
-# function to calculate if there should be a new wave
-def is_wave(current_num_enemies):
-    if current_num_enemies < 3:
-        return True
-    return False
-
-
-
 def scrollY(screenSurf, offsetY):
     width, height = screenSurf.get_size()
     copySurf = screenSurf.copy()
@@ -124,7 +112,6 @@ def scrollY(screenSurf, offsetY):
     else:
         screenSurf.blit(copySurf, (0, 0), (0, height - offsetY, width, offsetY))
 
-# ideally this will be a 'game' object, with enemies, a player, and all of the things we rely on global for
 def game():
     global FPSCLOCK
     #global NUM_WAVES
@@ -175,7 +162,7 @@ def game():
         # just a temporary workaround for a real solution in the future.
         if FPSCLOCK.get_time() % 16 == 0:
             # check if we start a wave
-            if is_wave(len(GAME.ENEMIES)):
+            if GAME.is_wave():
                 print(f"Spawning Enemy Wave: {GAME.NUM_WAVES}")
                 GAME.spawn_enemy_wave()
 
@@ -187,22 +174,6 @@ def game():
         if showhitboxes:
             pygame.draw.rect(DISPLAYSURF, (0, 255, 0), GAME.PLAYER.rect)
 
-        for enemy in GAME.ENEMIES:
-            enemy.animate()
-            if showhitboxes:
-                pygame.draw.rect(DISPLAYSURF, (0, 0, 255), enemy.rect)
-            for other_enemy in GAME.ENEMIES:
-                enemy.bounce_off(other_enemy)
-            if enemy.rect.centery > WINDOW_HEIGHT:
-                # enemy went off bottom of screen
-                GAME.ENEMIES.remove(enemy)
-                GAME.PLAYER.score_minus(1)
-            elif enemy.did_collide_with(player):
-                GAME.PLAYER.hitpoints -= 1
-                print(f"Hitpoints: {GAME.PLAYER.hitpoints}")
-                if not GAME.PLAYER.isAlive():
-                    pass
-                GAME.ENEMIES.remove(enemy)
 
         for bullet in GAME.BULLETS:
             bullet.animate()
@@ -228,22 +199,38 @@ def game():
                     if enemy.hitpoints < 1:
                         GAME.ENEMIES.remove(enemy)
                         GAME.PLAYER.score_plus(1)
+                else:
+                    enemy.animate()
+                    if showhitboxes:
+                        pygame.draw.rect(DISPLAYSURF, (0, 0, 255), enemy.rect)
+                    for other_enemy in GAME.ENEMIES:
+                        enemy.bounce_off(other_enemy)
+                    if enemy.rect.centery > WINDOW_HEIGHT:
+                        # enemy went off bottom of screen
+                        GAME.ENEMIES.remove(enemy)
+                        GAME.PLAYER.score_minus(1)
+                    elif enemy.did_collide_with(player):
+                        GAME.PLAYER.hitpoints -= 1
+                        print(f"Hitpoints: {GAME.PLAYER.hitpoints}")
+                        if not GAME.PLAYER.isAlive():
+                            pass
+                        GAME.ENEMIES.remove(enemy)
+
             for health in GAME.HEALTHMODULES:
                 if bullet.did_collide_with(health) and bullet.is_exploding is False:
                     bullet.is_exploding = True
                     health.hitpoints -= 1
                     GAME.HEALTHMODULES.remove(health)
-
-        for health in GAME.HEALTHMODULES:
-            health.animate()
-            if showhitboxes:
-                pygame.draw.rect(DISPLAYSURF, (255, 0, 0), health.rect)
-            if health.rect.centery > WINDOW_HEIGHT:
-                GAME.HEALTHMODULES.remove(health)
-            elif health.did_collide_with(player):
-                if GAME.PLAYER.hitpoints < MAX_HEALTH:
-                    GAME.PLAYER.hitpoints += 1
-                GAME.HEALTHMODULES.remove(health)
+                else:
+                    health.animate()
+                    if showhitboxes:
+                        pygame.draw.rect(DISPLAYSURF, (255, 0, 0), health.rect)
+                    if health.rect.centery > WINDOW_HEIGHT:
+                        GAME.HEALTHMODULES.remove(health)
+                    elif health.did_collide_with(player):
+                        if GAME.PLAYER.hitpoints < MAX_HEALTH:
+                            GAME.PLAYER.hitpoints += 1
+                        GAME.HEALTHMODULES.remove(health)
 
         # respond to user input events
         for event in pygame.event.get():
@@ -343,6 +330,11 @@ class Game:
         health.is_moving_down = True
 
         self.HEALTHMODULES.append(health)
+
+    def is_wave(self):
+        if len(self.ENEMIES) < 3:
+            return True
+        return False
 
     def spawn_enemy(self):
         direction = random.choice(["diagonal", "down"])
