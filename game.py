@@ -188,7 +188,6 @@ def game():
                 except:
                     print("failed to remove bullet")
             for enemy in GAME.ENEMIES:
-                enemy.animate()
                 if bullet.did_collide_with(enemy) and bullet.is_exploding is False:
                     # direct hit!
                     # TODO add sound effect and explosion animation here
@@ -200,7 +199,6 @@ def game():
                         GAME.ENEMIES.remove(enemy)
                         GAME.PLAYER.score_plus(1)
                 else:
-                    #enemy.animate()
                     if showhitboxes:
                         pygame.draw.rect(DISPLAYSURF, (0, 0, 255), enemy.rect)
                     for other_enemy in GAME.ENEMIES:
@@ -217,7 +215,6 @@ def game():
                         GAME.ENEMIES.remove(enemy)
 
             for health in GAME.HEALTHMODULES:
-                health.animate()
                 if bullet.did_collide_with(health) and bullet.is_exploding is False:
                     bullet.is_exploding = True
                     health.hitpoints -= 1
@@ -232,6 +229,11 @@ def game():
                         if GAME.PLAYER.hitpoints < MAX_HEALTH:
                             GAME.PLAYER.hitpoints += 1
                         GAME.HEALTHMODULES.remove(health)
+
+        for e in GAME.ENEMIES:
+            e.animate()
+        for h in GAME.HEALTHMODULES:
+            h.animate()
 
         # respond to user input events
         for event in pygame.event.get():
