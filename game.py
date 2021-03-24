@@ -174,6 +174,7 @@ def game():
 
     # create player object with initial location. Size is approximate based on image file
     player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 100, 130), DISPLAYSURF, player_img)
+    GAME = Game(self, 0, DISPLAYSURF, player)
     alive = True
 
     showhitboxes = False
@@ -361,6 +362,7 @@ class Game:
     DIFFICULTY = 0 # 0 for easy/default (to be implemented
     #DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
     DISPLAYSURF = None
+    NUM_WAVES = 0 # TODO: implement this in the code!!!
 
     def __init__(self, difficulty, display_surface, player):
         self.DIFFICULTY = difficulty
@@ -386,4 +388,15 @@ class Game:
                 enemy.is_moving_left = True
         self.ENEMIES.append(enemy)
 
+    def spawn_enemy_wave(self, num_prev_waves):
+        # .3 * number of prev waves - we want 1 more enemy for every 3 waves
+        # player_score % 3 - this is a way to add randomness to the waves, while not being taxing on resources; will spawn between 0 and 2 enemies
+        # player_hp * .5 - we subtract this value, because as player health goes down, the number of enemy spawns goes up; a penalty for taking damage
+        # and lastly the + 3 ; this is so that we meet the 'wave' conditions
+        num_of_enemies = int((.3 * num_prev_waves) + (self.PLAYER.get_score() % 3) - (self.PLAYER.get_hitpoints() * .5) + 3)
+        for i in range(num_of_enemies):
+            self.spawn_enemy()
 
+
+if __name__ == "__main__":
+    main()
