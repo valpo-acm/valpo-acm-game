@@ -81,10 +81,10 @@ def gameover():
 
     new_highscore = False
 
-    if data['high_score'] < player.get_score():
-        data['high_score'] = player.get_score()
+    if data['high_score'] < GAME.PLAYER.get_score():
+        data['high_score'] = GAME.PLAYER.get_score()
         save_data()
-        print(f"New High Score of: {player.get_score()}!")
+        print(f"New High Score of: {GAME.PLAYER.get_score()}!")
         new_highscore = True
 
     while (not finished):
@@ -95,7 +95,7 @@ def gameover():
         DISPLAYSURF.blit(gameover_img, (0,0))
 
         if new_highscore:
-            scoreboardFont.render_to(DISPLAYSURF, (60, WINDOW_HEIGHT/2), f'New Highscore! {player.get_score()}', (255,255,255))
+            scoreboardFont.render_to(DISPLAYSURF, (60, WINDOW_HEIGHT/2), f'New Highscore! {GAME.PLAYER.get_score()}', (255,255,255))
 
         for event in pygame.event.get():
             if event.type == QUIT: # quit game if user presses close on welcome screen
@@ -136,7 +136,7 @@ def scrollY(screenSurf, offsetY):
 # ideally this will be a 'game' object, with enemies, a player, and all of the things we rely on global for
 def game():
     global FPSCLOCK
-    global NUM_WAVES
+    #global NUM_WAVES
     pygame.init()
 
     # Create clock object
@@ -154,7 +154,7 @@ def game():
 
     scroll = 0  #scrolling
     # main game loop
-    while player.isAlive():
+    while GAME.PLAYER.isAlive():
         # Current Order:
         # - fill backround
         # - handle scrolling
@@ -191,10 +191,10 @@ def game():
                 if GAME.NUM_WAVES % HEALTH_FREQUENCY == 0:
                     spawn_health()
 
-        player.animate()
+        GAME.PLAYER.animate()
 
         if showhitboxes:
-            pygame.draw.rect(DISPLAYSURF, (0, 255, 0), player.rect)
+            pygame.draw.rect(DISPLAYSURF, (0, 255, 0), GAME.PLAYER.rect)
 
         for enemy in GAME.ENEMIES:
             enemy.animate()
@@ -205,11 +205,11 @@ def game():
             if enemy.rect.centery > WINDOW_HEIGHT:
                 # enemy went off bottom of screen
                 GAME.ENEMIES.remove(enemy)
-                player.score_minus(1)
+                GAME.PLAYER.score_minus(1)
             elif enemy.did_collide_with(player):
-                player.hitpoints -= 1
-                print(f"Hitpoints: {player.hitpoints}")
-                if not player.isAlive():
+                GAME.PLAYER.hitpoints -= 1
+                print(f"Hitpoints: {GAME.PLAYER.hitpoints}")
+                if not GAME.PLAYER.isAlive():
                     pass
                 GAME.ENEMIES.remove(enemy)
 
@@ -236,7 +236,7 @@ def game():
                     enemy.hitpoints -= 1
                     if enemy.hitpoints < 1:
                         GAME.ENEMIES.remove(enemy)
-                        player.score_plus(1)
+                        GAME.PLAYER.score_plus(1)
             for health in HEALTHMODULES:
                 if bullet.did_collide_with(health) and bullet.is_exploding is False:
                     bullet.is_exploding = True
@@ -250,8 +250,8 @@ def game():
             if health.rect.centery > WINDOW_HEIGHT:
                 HEALTHMODULES.remove(health)
             elif health.did_collide_with(player):
-                if player.hitpoints < MAX_HEALTH:
-                    player.hitpoints += 1
+                if GAME.PLAYER.hitpoints < MAX_HEALTH:
+                    GAME.PLAYER.hitpoints += 1
                 HEALTHMODULES.remove(health)
 
         # respond to user input events
@@ -261,25 +261,25 @@ def game():
                 sys.exit()
             elif event.type == MOUSEBUTTONDOWN or (event.type == KEYDOWN and event.key == K_SPACE):  # presses mouse button or press space
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                player.shoot(mouse_x, mouse_y, GAME.BULLETS)
+                GAME.PLAYER.shoot(mouse_x, mouse_y, GAME.BULLETS)
                 laser_sound.play()
             elif event.type == KEYDOWN and event.key == K_a:  # presses A
-                player.is_moving_left = True
+                GAME.PLAYER.is_moving_left = True
             elif event.type == KEYUP and event.key == K_a:  # releases A
-                player.is_moving_left = False
+                GAME.PLAYER.is_moving_left = False
             elif event.type == KEYDOWN and event.key == K_d:  # presses D
-                player.is_moving_right = True
+                GAME.PLAYER.is_moving_right = True
             elif event.type == KEYUP and event.key == K_d:  # releases d
-                player.is_moving_right = False
+                GAME.PLAYER.is_moving_right = False
                 # below is to move player forward and backward, same logic as above
             elif event.type == KEYUP and event.key == K_w:
-                player.is_moving_up = False
+                GAME.PLAYER.is_moving_up = False
             elif event.type == KEYDOWN and event.key == K_w:
-                player.is_moving_up = True
+                GAME.PLAYER.is_moving_up = True
             elif event.type == KEYUP and event.key == K_s:
-                player.is_moving_down = False
+                GAME.PLAYER.is_moving_down = False
             elif event.type == KEYDOWN and event.key == K_s:
-                player.is_moving_down = True
+                GAME.PLAYER.is_moving_down = True
             # temporary testing line
             elif event.type == KEYDOWN and event.key == K_e:
                 spawn_enemy()
@@ -288,8 +288,8 @@ def game():
             elif event.type == KEYDOWN and event.key == K_b:
                 showhitboxes = not showhitboxes
 
-        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(player.get_score()), (255,255,255))
-        scoreboardFont.render_to(DISPLAYSURF, (30, 100), str(player.hitpoints), (255, 0, 0))
+        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(GAME.PLAYER.get_score()), (255,255,255))
+        scoreboardFont.render_to(DISPLAYSURF, (30, 100), str(GAME.PLAYER.hitpoints), (255, 0, 0))
         scoreboardFont.render_to(DISPLAYSURF, (WINDOW_WIDTH * .6, 30), "Best: " + str(data['high_score']), (255,255,0))
 
         # I dont think we need both flip() and update(). I think they do the same thing when you call with no arguments
