@@ -112,18 +112,19 @@ def scrollY(screenSurf, offsetY):
 
 def game():
     global FPSCLOCK
+    global DISPLAYSURF
     #global NUM_WAVES
     pygame.init()
 
     # Create clock object
     FPSCLOCK = pygame.time.Clock()
     # set up window
-    GAMESURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
+    #DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
     pygame.display.set_caption("WASD to move. Space to Shoot")
 
     # create player object with initial location. Size is approximate based on image file
-    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 100, 130), GAMESURF, player_img)
-    GAME = Game(0, GAMESURF, player)
+    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 100, 130), DISPLAYSURF, player_img)
+    GAME = Game(0, DISPLAYSURF, player)
     alive = True
 
     showhitboxes = False
@@ -146,8 +147,8 @@ def game():
         # - update the clock
 
         # set background color
-        GAMESURF.blit(background_img, (0,0))
-        scrollY(GAMESURF, scroll)
+        DISPLAYSURF.blit(background_img, (0,0))
+        scrollY(DISPLAYSURF, scroll)
         scroll = (scroll + 2)%WINDOW_HEIGHT
         # create a player surface, and rotate the player image the appropriate number of degrees
         # player_angle = 0
@@ -170,7 +171,7 @@ def game():
         GAME.PLAYER.animate()
 
         if showhitboxes:
-            pygame.draw.rect(GAMESURF, (0, 255, 0), GAME.PLAYER.rect)
+            pygame.draw.rect(DISPLAYSURF, (0, 255, 0), GAME.PLAYER.rect)
 
 
         for bullet in GAME.BULLETS:
@@ -187,6 +188,7 @@ def game():
                 except:
                     print("failed to remove bullet")
             for enemy in GAME.ENEMIES:
+                enemy.animate()
                 if bullet.did_collide_with(enemy) and bullet.is_exploding is False:
                     # direct hit!
                     # TODO add sound effect and explosion animation here
@@ -198,9 +200,9 @@ def game():
                         GAME.ENEMIES.remove(enemy)
                         GAME.PLAYER.score_plus(1)
                 else:
-                    enemy.animate()
+                    #enemy.animate()
                     if showhitboxes:
-                        pygame.draw.rect(GAMESURF, (0, 0, 255), enemy.rect)
+                        pygame.draw.rect(DISPLAYSURF, (0, 0, 255), enemy.rect)
                     for other_enemy in GAME.ENEMIES:
                         enemy.bounce_off(other_enemy)
                     if enemy.rect.centery > WINDOW_HEIGHT:
@@ -215,14 +217,15 @@ def game():
                         GAME.ENEMIES.remove(enemy)
 
             for health in GAME.HEALTHMODULES:
+                health.animate()
                 if bullet.did_collide_with(health) and bullet.is_exploding is False:
                     bullet.is_exploding = True
                     health.hitpoints -= 1
                     GAME.HEALTHMODULES.remove(health)
                 else:
-                    health.animate()
+                    #health.animate()
                     if showhitboxes:
-                        pygame.draw.rect(GAMESURF, (255, 0, 0), health.rect)
+                        pygame.draw.rect(DISPLAYSURF, (255, 0, 0), health.rect)
                     if health.rect.centery > WINDOW_HEIGHT:
                         GAME.HEALTHMODULES.remove(health)
                     elif health.did_collide_with(player):
@@ -264,9 +267,9 @@ def game():
             elif event.type == KEYDOWN and event.key == K_b:
                 showhitboxes = not showhitboxes
 
-        scoreboardFont.render_to(GAMESURF, (30, 30), str(GAME.PLAYER.get_score()), (255,255,255))
-        scoreboardFont.render_to(GAMESURF, (30, 100), str(GAME.PLAYER.hitpoints), (255, 0, 0))
-        scoreboardFont.render_to(GAMESURF, (WINDOW_WIDTH * .6, 30), "Best: " + str(data['high_score']), (255,255,0))
+        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(GAME.PLAYER.get_score()), (255,255,255))
+        scoreboardFont.render_to(DISPLAYSURF, (30, 100), str(GAME.PLAYER.hitpoints), (255, 0, 0))
+        scoreboardFont.render_to(DISPLAYSURF, (WINDOW_WIDTH * .6, 30), "Best: " + str(data['high_score']), (255,255,0))
 
         # I dont think we need both flip() and update(). I think they do the same thing when you call with no arguments
         pygame.display.flip()
@@ -317,14 +320,14 @@ class Game:
         self.DIFFICULTY = difficulty
         self.DISPLAYSURF = display_surface
         self.PLAYER = player
-        self.WIDTH = self.DISPLAYSURF.get_size()[0]
-        self.HEIGHT = self.DISPLAYSURF.get_size()[1]
+        self.WIDTH = DISPLAYSURF.get_size()[0]
+        self.HEIGHT = DISPLAYSURF.get_size()[1]
 
     def spawn_health(self):
         speed = random.choice(range(4, 8))
         w = 50 + random.choice(range(self.WIDTH - 100)) # spawn the health so it is not partially off screen
 
-        health = HealthModule(pygame.Rect(w, -80, 75, 75), self.DISPLAYSURF, health_img, speed) # the rectangle size needs to be adjusted
+        health = HealthModule(pygame.Rect(w, -80, 75, 75), DISPLAYSURF, health_img, speed) # the rectangle size needs to be adjusted
         health.is_moving_down = True
 
         self.HEALTHMODULES.append(health)
@@ -338,10 +341,10 @@ class Game:
         direction = random.choice(["diagonal", "down"])
         speed = random.choice(range(2, 8))
         # TODO: check to make sure the width is the first element in the tuple!!
-        w = random.choice(range(self.DISPLAYSURF.get_size()[0]))
+        w = random.choice(range(DISPLAYSURF.get_size()[0]))
         # enemy spawns just off the top of the screen, so we don't see them pop into existence
 
-        enemy = Enemy(pygame.Rect(w, -80, 100, 105), self.DISPLAYSURF, enemy_img, speed)
+        enemy = Enemy(pygame.Rect(w, -80, 100, 105), DISPLAYSURF, enemy_img, speed)
         enemy.is_moving_down = True
         # add left/right movement 1/2 of the time
         if direction == "diagonal":
