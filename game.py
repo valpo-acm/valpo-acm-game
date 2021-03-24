@@ -19,8 +19,6 @@ DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 ENEMIES = []
 HEALTHMODULES = []
 
-PLAYER_SCORE = 0
-
 # Absolute path of the folder that contains this file.
 PATH = str(Path(__file__).parent.absolute()) + "/"
 
@@ -83,10 +81,10 @@ def gameover():
 
     new_highscore = False
 
-    if data['high_score'] < PLAYER_SCORE:
-        data['high_score'] = PLAYER_SCORE
+    if data['high_score'] < player.get_score():
+        data['high_score'] = player.get_score()
         save_data()
-        print(f"New High Score of: {PLAYER_SCORE}!")
+        print(f"New High Score of: {player.get_score()}!")
         new_highscore = True
 
     while (not finished):
@@ -97,7 +95,7 @@ def gameover():
         DISPLAYSURF.blit(gameover_img, (0,0))
 
         if new_highscore:
-            scoreboardFont.render_to(DISPLAYSURF, (60, WINDOW_HEIGHT/2), f'New Highscore! {PLAYER_SCORE}', (255,255,255))
+            scoreboardFont.render_to(DISPLAYSURF, (60, WINDOW_HEIGHT/2), f'New Highscore! {player.get_score()}', (255,255,255))
 
         for event in pygame.event.get():
             if event.type == QUIT: # quit game if user presses close on welcome screen
@@ -166,7 +164,6 @@ def scrollY(screenSurf, offsetY):
 def game():
     global FPSCLOCK
     global NUM_WAVES
-    global PLAYER_SCORE
     pygame.init()
 
     # Create clock object
@@ -184,7 +181,7 @@ def game():
     bullets = []
     scroll = 0  #scrolling
     # main game loop
-    while alive:
+    while player.isAlive():
         # Current Order:
         # - fill backround
         # - handle scrolling
@@ -236,13 +233,11 @@ def game():
             if enemy.rect.centery > WINDOW_HEIGHT:
                 # enemy went off bottom of screen
                 ENEMIES.remove(enemy)
-                PLAYER_SCORE -= 1
+                player.score_minus(1)
             elif enemy.did_collide_with(player):
                 player.hitpoints -= 1
                 print(f"Hitpoints: {player.hitpoints}")
-                if player.hitpoints < 1:
-                    # GAME OVER!
-                    alive = False
+                if not player.isAlive():
                     pass
                 ENEMIES.remove(enemy)
 
@@ -269,7 +264,7 @@ def game():
                     enemy.hitpoints -= 1
                     if enemy.hitpoints < 1:
                         ENEMIES.remove(enemy)
-                        PLAYER_SCORE += 1
+                        player.score_plus(1)
             for health in HEALTHMODULES:
                 if bullet.did_collide_with(health) and bullet.is_exploding is False:
                     bullet.is_exploding = True
@@ -321,7 +316,7 @@ def game():
             elif event.type == KEYDOWN and event.key == K_b:
                 showhitboxes = not showhitboxes
 
-        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(PLAYER_SCORE), (255,255,255))
+        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(player.get_score()), (255,255,255))
         scoreboardFont.render_to(DISPLAYSURF, (30, 100), str(player.hitpoints), (255, 0, 0))
         scoreboardFont.render_to(DISPLAYSURF, (WINDOW_WIDTH * .6, 30), "Best: " + str(data['high_score']), (255,255,0))
 
@@ -361,16 +356,16 @@ def main():
 class Game:
     # instance variables
     ENEMIES = []
-    PLAYER_ALIVE = True
+    PLAYER = None
     HEALTHMODULES = []
-    PLAYER_SCORE = 0
     DIFFICULTY = 0 # 0 for easy/default (to be implemented
     #DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
     DISPLAYSURF = None
 
-    def __init__(self, difficulty, display_surface):
+    def __init__(self, difficulty, display_surface, player):
         self.DIFFICULTY = difficulty
         self.DISPLAYSURF = display_surface
+        self.PLAYER = player
 
     def spawn_enemy():
         direction = random.choice(["diagonal", "down"])
