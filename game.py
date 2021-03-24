@@ -104,24 +104,6 @@ def gameover():
         pygame.display.flip()
 
 
-def spawn_enemy():
-    direction = random.choice(["diagonal", "down"])
-    speed = random.choice(range(2, 8))
-    w = random.choice(range(WINDOW_WIDTH))
-    # h = random.choice(range(WINDOW_HEIGHT))
-
-    # enemy spawns just off the top of the screen, so we don't see them pop into existence
-    enemy = Enemy(pygame.Rect(w, -80, 100, 105), DISPLAYSURF, enemy_img, speed)
-    enemy.is_moving_down = True
-    # add left/right movement 1/2 of the time
-    if direction == "diagonal":
-        if w <= WINDOW_WIDTH / 2:
-            # spawned on left half of screen
-            enemy.is_moving_right = True
-        else:
-            # spawned on right side of screen
-            enemy.is_moving_left = True
-    ENEMIES.append(enemy)
 
 
 def spawn_health():
@@ -140,15 +122,6 @@ def is_wave(current_num_enemies):
         return True
     return False
 
-
-def spawn_enemy_wave(num_prev_waves, player_score, player_hp):
-    # .3 * number of prev waves - we want 1 more enemy for every 3 waves
-    # player_score % 3 - this is a way to add randomness to the waves, while not being taxing on resources; will spawn between 0 and 2 enemies
-    # player_hp * .5 - we subtract this value, because as player health goes down, the number of enemy spawns goes up; a penalty for taking damage
-    # and lastly the + 3 ; this is so that we meet the 'wave' conditions
-    num_of_enemies = int((.3 * num_prev_waves) + (player_score % 3) - (player_hp * .5) + 3)
-    for i in range(num_of_enemies):
-        spawn_enemy()
 
 
 def scrollY(screenSurf, offsetY):
@@ -174,12 +147,11 @@ def game():
 
     # create player object with initial location. Size is approximate based on image file
     player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 100, 130), DISPLAYSURF, player_img)
-    GAME = Game(self, 0, DISPLAYSURF, player)
+    GAME = Game(0, DISPLAYSURF, player)
     alive = True
 
     showhitboxes = False
 
-    bullets = []
     scroll = 0  #scrolling
     # main game loop
     while player.isAlive():
@@ -199,7 +171,7 @@ def game():
 
         # set background color
         DISPLAYSURF.blit(background_img, (0,0))
-        scrollY(DISPLAYSURF, scroll)
+        scrollY(GAME.DISPLAYSURF, scroll)
         scroll = (scroll + 2)%WINDOW_HEIGHT
         # create a player surface, and rotate the player image the appropriate number of degrees
         # player_angle = 0
@@ -212,12 +184,11 @@ def game():
         # just a temporary workaround for a real solution in the future.
         if FPSCLOCK.get_time() % 16 == 0:
             # check if we start a wave
-            if is_wave(len(ENEMIES)):
-                print(f"Spawning Enemy Wave: {NUM_WAVES}")
-                spawn_enemy_wave(NUM_WAVES, 0, 0)
-                NUM_WAVES += 1
+            if is_wave(len(GAME.ENEMIES)):
+                print(f"Spawning Enemy Wave: {GAME.NUM_WAVES}")
+                GAME.spawn_enemy_wave()
 
-                if NUM_WAVES % HEALTH_FREQUENCY == 0:
+                if GAME.NUM_WAVES % HEALTH_FREQUENCY == 0:
                     spawn_health()
 
         player.animate()
@@ -225,37 +196,37 @@ def game():
         if showhitboxes:
             pygame.draw.rect(DISPLAYSURF, (0, 255, 0), player.rect)
 
-        for enemy in ENEMIES:
+        for enemy in GAME.ENEMIES:
             enemy.animate()
             if showhitboxes:
                 pygame.draw.rect(DISPLAYSURF, (0, 0, 255), enemy.rect)
-            for other_enemy in ENEMIES:
+            for other_enemy in GAME.ENEMIES:
                 enemy.bounce_off(other_enemy)
             if enemy.rect.centery > WINDOW_HEIGHT:
                 # enemy went off bottom of screen
-                ENEMIES.remove(enemy)
+                GAME.ENEMIES.remove(enemy)
                 player.score_minus(1)
             elif enemy.did_collide_with(player):
                 player.hitpoints -= 1
                 print(f"Hitpoints: {player.hitpoints}")
                 if not player.isAlive():
                     pass
-                ENEMIES.remove(enemy)
+                GAME.ENEMIES.remove(enemy)
 
-        for bullet in bullets:
+        for bullet in GAME.BULLETS:
             bullet.animate()
             x = bullet.rect.centerx
             y = bullet.rect.centery
             if y < 0 or y > WINDOW_HEIGHT or x < 0 or x > WINDOW_WIDTH:
                 # remove bullet when it goes off screen
-                bullets.remove(bullet)
+                GAME.BULLETS.remove(bullet)
                 continue
             if bullet.is_finished_exploding:
                 try:
-                    bullets.remove(bullet)
+                    GAME.BULLETS.remove(bullet)
                 except:
                     print("failed to remove bullet")
-            for enemy in ENEMIES:
+            for enemy in GAME.ENEMIES:
                 if bullet.did_collide_with(enemy) and bullet.is_exploding is False:
                     # direct hit!
                     # TODO add sound effect and explosion animation here
@@ -264,7 +235,7 @@ def game():
                     bullet.is_exploding = True
                     enemy.hitpoints -= 1
                     if enemy.hitpoints < 1:
-                        ENEMIES.remove(enemy)
+                        GAME.ENEMIES.remove(enemy)
                         player.score_plus(1)
             for health in HEALTHMODULES:
                 if bullet.did_collide_with(health) and bullet.is_exploding is False:
@@ -290,7 +261,7 @@ def game():
                 sys.exit()
             elif event.type == MOUSEBUTTONDOWN or (event.type == KEYDOWN and event.key == K_SPACE):  # presses mouse button or press space
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                player.shoot(mouse_x, mouse_y, bullets)
+                player.shoot(mouse_x, mouse_y, GAME.BULLETS)
                 laser_sound.play()
             elif event.type == KEYDOWN and event.key == K_a:  # presses A
                 player.is_moving_left = True
@@ -357,10 +328,10 @@ def main():
 class Game:
     # instance variables
     ENEMIES = []
+    BULLETS = []
     PLAYER = None
     HEALTHMODULES = []
     DIFFICULTY = 0 # 0 for easy/default (to be implemented
-    #DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
     DISPLAYSURF = None
     NUM_WAVES = 0 # TODO: implement this in the code!!!
 
@@ -369,14 +340,14 @@ class Game:
         self.DISPLAYSURF = display_surface
         self.PLAYER = player
 
-    def spawn_enemy():
+    def spawn_enemy(self):
         direction = random.choice(["diagonal", "down"])
         speed = random.choice(range(2, 8))
         # TODO: check to make sure the width is the first element in the tuple!!
-        w = random.choice(range(self.DISPLAYSURF.get_window_size()[0]))
+        w = random.choice(range(self.DISPLAYSURF.get_size()[0]))
         # enemy spawns just off the top of the screen, so we don't see them pop into existence
 
-        enemy = Enemy(pygame.Rect(w, -80, 100, 105), DISPLAYSURF, enemy_img, speed)
+        enemy = Enemy(pygame.Rect(w, -80, 100, 105), self.DISPLAYSURF, enemy_img, speed)
         enemy.is_moving_down = True
         # add left/right movement 1/2 of the time
         if direction == "diagonal":
@@ -388,14 +359,15 @@ class Game:
                 enemy.is_moving_left = True
         self.ENEMIES.append(enemy)
 
-    def spawn_enemy_wave(self, num_prev_waves):
+    def spawn_enemy_wave(self):
         # .3 * number of prev waves - we want 1 more enemy for every 3 waves
         # player_score % 3 - this is a way to add randomness to the waves, while not being taxing on resources; will spawn between 0 and 2 enemies
         # player_hp * .5 - we subtract this value, because as player health goes down, the number of enemy spawns goes up; a penalty for taking damage
         # and lastly the + 3 ; this is so that we meet the 'wave' conditions
-        num_of_enemies = int((.3 * num_prev_waves) + (self.PLAYER.get_score() % 3) - (self.PLAYER.get_hitpoints() * .5) + 3)
+        num_of_enemies = int((.3 * self.NUM_WAVES) + (self.PLAYER.get_score() % 3) - (self.PLAYER.get_hitpoints() * .5) + 3)
         for i in range(num_of_enemies):
             self.spawn_enemy()
+        self.NUM_WAVES += 1
 
 
 if __name__ == "__main__":
