@@ -118,6 +118,9 @@ class Player(GameObject):
         bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface, target_x, target_y)
         bullets_list.append(bullet)
 
+    def get_hitpoints(self):
+        return self.hitpoints
+
     def isAlive(self):
         if self.hitpoints < 1:
             return False
