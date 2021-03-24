@@ -162,7 +162,7 @@ def scrollY(screenSurf, offsetY):
     else:
         screenSurf.blit(copySurf, (0, 0), (0, height - offsetY, width, offsetY))
 
-
+# ideally this will be a 'game' object, with enemies, a player, and all of the things we rely on global for
 def game():
     global FPSCLOCK
     global NUM_WAVES
