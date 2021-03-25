@@ -119,12 +119,12 @@ def game():
     # Create clock object
     FPSCLOCK = pygame.time.Clock()
     # set up window
-    #DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
+    GAMESURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
     pygame.display.set_caption("WASD to move. Space to Shoot")
 
     # create player object with initial location. Size is approximate based on image file
-    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 100, 130), DISPLAYSURF, player_img)
-    GAME = Game(0, DISPLAYSURF, player)
+    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 100, 130), GAMESURF, player_img)
+    GAME = Game(0, GAMESURF, player)
     alive = True
 
     showhitboxes = False
@@ -147,8 +147,8 @@ def game():
         # - update the clock
 
         # set background color
-        DISPLAYSURF.blit(background_img, (0,0))
-        scrollY(DISPLAYSURF, scroll)
+        GAME.SURF.blit(background_img, (0,0))
+        scrollY(GAME.SURF, scroll)
         scroll = (scroll + 2)%WINDOW_HEIGHT
         # create a player surface, and rotate the player image the appropriate number of degrees
         # player_angle = 0
@@ -170,7 +170,7 @@ def game():
 
 
         if showhitboxes:
-            pygame.draw.rect(DISPLAYSURF, (0, 255, 0), GAME.PLAYER.rect)
+            pygame.draw.rect(GAME.SURF, (0, 255, 0), GAME.PLAYER.rect)
 
         GAME.handle_bullet_collisions()
 
@@ -217,9 +217,9 @@ def game():
             elif event.type == KEYDOWN and event.key == K_b:
                 showhitboxes = not showhitboxes
 
-        scoreboardFont.render_to(DISPLAYSURF, (30, 30), str(GAME.PLAYER.get_score()), (255,255,255))
-        scoreboardFont.render_to(DISPLAYSURF, (30, 100), str(GAME.PLAYER.hitpoints), (255, 0, 0))
-        scoreboardFont.render_to(DISPLAYSURF, (WINDOW_WIDTH * .6, 30), "Best: " + str(data['high_score']), (255,255,0))
+        scoreboardFont.render_to(GAME.SURF, (30, 30), str(GAME.PLAYER.get_score()), (255,255,255))
+        scoreboardFont.render_to(GAME.SURF, (30, 100), str(GAME.PLAYER.hitpoints), (255, 0, 0))
+        scoreboardFont.render_to(GAME.SURF, (GAME.WIDTH * .6, 30), "Best: " + str(data['high_score']), (255,255,0))
 
         # I dont think we need both flip() and update(). I think they do the same thing when you call with no arguments
         pygame.display.flip()
@@ -277,7 +277,7 @@ class Game:
         speed = random.choice(range(4, 8))
         w = 50 + random.choice(range(self.WIDTH - 100)) # spawn the health so it is not partially off screen
 
-        health = HealthModule(pygame.Rect(w, -80, 75, 75), DISPLAYSURF, health_img, speed) # the rectangle size needs to be adjusted
+        health = HealthModule(pygame.Rect(w, -80, 75, 75), self.SURF, health_img, speed) # the rectangle size needs to be adjusted
         health.is_moving_down = True
 
         self.HEALTHMODULES.append(health)
@@ -291,10 +291,10 @@ class Game:
         direction = random.choice(["diagonal", "down"])
         speed = random.choice(range(2, 8))
         # TODO: check to make sure the width is the first element in the tuple!!
-        w = random.choice(range(DISPLAYSURF.get_size()[0]))
+        w = random.choice(range(self.SURF.get_size()[0]))
         # enemy spawns just off the top of the screen, so we don't see them pop into existence
 
-        enemy = Enemy(pygame.Rect(w, -80, 100, 105), DISPLAYSURF, enemy_img, speed)
+        enemy = Enemy(pygame.Rect(w, -80, 100, 105), self.SURF, enemy_img, speed)
         enemy.is_moving_down = True
         # add left/right movement 1/2 of the time
         if direction == "diagonal":
