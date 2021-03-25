@@ -207,12 +207,6 @@ def game():
                         # enemy went off bottom of screen
                         GAME.ENEMIES.remove(enemy)
                         GAME.PLAYER.score_minus(1)
-                    elif enemy.did_collide_with(player):
-                        GAME.PLAYER.hitpoints -= 1
-                        print(f"Hitpoints: {GAME.PLAYER.hitpoints}")
-                        if not GAME.PLAYER.isAlive():
-                            pass
-                        GAME.ENEMIES.remove(enemy)
 
             for health in GAME.HEALTHMODULES:
                 if bullet.did_collide_with(health) and bullet.is_exploding is False:
@@ -220,18 +214,28 @@ def game():
                     health.hitpoints -= 1
                     GAME.HEALTHMODULES.remove(health)
                 else:
-                    #health.animate()
                     if showhitboxes:
                         pygame.draw.rect(DISPLAYSURF, (255, 0, 0), health.rect)
                     if health.rect.centery > WINDOW_HEIGHT:
                         GAME.HEALTHMODULES.remove(health)
-                    elif health.did_collide_with(player):
-                        if GAME.PLAYER.hitpoints < MAX_HEALTH:
-                            GAME.PLAYER.hitpoints += 1
-                        GAME.HEALTHMODULES.remove(health)
 
+        for health in GAME.HEALTHMODULES:
+            if health.did_collide_with(player):
+                if GAME.PLAYER.hitpoints < MAX_HEALTH:
+                    GAME.PLAYER.hitpoints += 1
+                GAME.HEALTHMODULES.remove(health)
+
+        for enemy in GAME.ENEMIES:
+            if enemy.did_collide_with(player):
+                GAME.PLAYER.hitpoints -= 1
+                print(f"Hitpoints: {GAME.PLAYER.hitpoints}")
+                if not GAME.PLAYER.isAlive():
+                    pass
+                GAME.ENEMIES.remove(enemy)
+        # any that are left
         for e in GAME.ENEMIES:
             e.animate()
+
         for h in GAME.HEALTHMODULES:
             h.animate()
 
