@@ -113,7 +113,7 @@ def scrollY(screenSurf, offsetY):
 def game():
     global FPSCLOCK
     global DISPLAYSURF
-    #global NUM_WAVES
+    global GAME
     pygame.init()
 
     # Create clock object
