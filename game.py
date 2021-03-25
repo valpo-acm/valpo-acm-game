@@ -21,7 +21,7 @@ PATH = str(Path(__file__).parent.absolute()) + "/"
 
 # load image and sound files from filepath strings, also load data
 def loadconfig():
-    global BG, BLACK, FPS, NUM_WAVES, HEALTH_FREQUENCY, MAX_HEALTH, scoreboardFont, player_img, enemy_img, background_img, title_img, gameover_img, health_img, laser_sound, hit, music, data
+    global BG, BLACK, FPS, SCOREBOARD_FONT, BACKGROUND_IMG, TITLE_IMG, GAMEOVER_IMG, LASER_SOUND, hit, music, data
 
     # Open and close the config file safely.
     with open(PATH + 'config.yaml', 'r') as file:
@@ -34,25 +34,18 @@ def loadconfig():
         # frames per second
         FPS = config['fps']
 
-        NUM_WAVES = config['waves']
-        HEALTH_FREQUENCY = config['health']
-        MAX_HEALTH = config['maxhealth']
-
-        scoreboardFont = pygame.freetype.SysFont(config['font']['style'], config['font']['size'], bold=True)
+        SCOREBOARD_FONT = pygame.freetype.SysFont(config['font']['style'], config['font']['size'], bold=True)
 
         assets = config['assets']
 
-        player_img = pygame.image.load(PATH + assets['player'])
-        enemy_img = pygame.image.load(PATH + assets['enemy'])
-        background_img = pygame.image.load(PATH + assets['background'])
-        title_img = pygame.image.load(PATH + assets['title'])
-        gameover_img = pygame.image.load(PATH + assets['gameover'])
-        health_img = pygame.image.load(PATH + assets['health'])
-        laser_sound = pygame.mixer.Sound(PATH + assets['laser'])
+        BACKGROUND_IMG = pygame.image.load(PATH + assets['background'])
+        TITLE_IMG = pygame.image.load(PATH + assets['title'])
+        GAMEOVER_IMG = pygame.image.load(PATH + assets['gameover'])
+        LASER_SOUND = pygame.mixer.Sound(PATH + assets['laser'])
         #hit = pygame.mixer.Sound(PATH + assets['hit'])
         #music = pygame.mixer.music.load(PATH + assets['music']) TODO: Not added yet
 
-        laser_sound.set_volume(config['volume']/100)
+        LASER_SOUND.set_volume(config['volume']/100)
 
     # Load data file from long term storage
     if Path(PATH + 'data.yaml').is_file():
@@ -89,10 +82,10 @@ def gameover():
         scroll = (scroll + 2)%WINDOW_HEIGHT
 
         DISPLAYSURF.fill(BLACK)
-        DISPLAYSURF.blit(gameover_img, (0,0))
+        DISPLAYSURF.blit(GAMEOVER_IMG, (0,0))
 
         if new_highscore:
-            scoreboardFont.render_to(DISPLAYSURF, (60, WINDOW_HEIGHT/2), f'New Highscore! {GAME.PLAYER.get_score()}', (255,255,255))
+            SCOREBOARD_FONT.render_to(DISPLAYSURF, (60, WINDOW_HEIGHT/2), f'New Highscore! {GAME.PLAYER.get_score()}', (255,255,255))
 
         for event in pygame.event.get():
             if event.type == QUIT: # quit game if user presses close on welcome screen
@@ -111,23 +104,25 @@ def scrollY(screenSurf, offsetY):
         screenSurf.blit(copySurf, (0, 0), (0, height - offsetY, width, offsetY))
 
 def game():
-    global FPSCLOCK
-    global DISPLAYSURF
     global GAME
     pygame.init()
 
     # Create clock object
     FPSCLOCK = pygame.time.Clock()
     # set up window
-    GAMESURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
     pygame.display.set_caption("WASD to move. Space to Shoot")
 
+    GAMESURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
+    GAME = Game(GAMESURF)
+    # may just pass in the path to the method so that the class doesn't have to import Pathlib
+    with open(PATH + 'config.yaml', 'r') as file:
+        GAME.configure(yaml.safe_load(file))
     # create player object with initial location. Size is approximate based on image file
-    player = Player(pygame.Rect(.4 * WINDOW_WIDTH, .66 * WINDOW_HEIGHT, 100, 130), GAMESURF, player_img)
-    GAME = Game(0, GAMESURF, player)
-    alive = True
+    player = Player(pygame.Rect(.4 * GAME.WIDTH, .66 * GAME.HEIGHT, 100, 130), GAME.SURF, GAME.PLAYER_IMG)
+    GAME.set_player(player)
+    GAME.set_difficulty(0) # effectively 'easy'
 
-    showhitboxes = False
+    #showhitboxes = False
 
     scroll = 0  #scrolling
     # main game loop
@@ -147,9 +142,9 @@ def game():
         # - update the clock
 
         # set background color
-        GAME.SURF.blit(background_img, (0,0))
+        GAME.SURF.blit(BACKGROUND_IMG, (0,0))
         scrollY(GAME.SURF, scroll)
-        scroll = (scroll + 2)%WINDOW_HEIGHT
+        scroll = (scroll + 2)%GAME.HEIGHT
         # create a player surface, and rotate the player image the appropriate number of degrees
         # player_angle = 0
         # PLAYER_SURF = pygame.transform.rotate(player_img, player_angle)
@@ -165,12 +160,12 @@ def game():
                 print(f"Spawning Enemy Wave: {GAME.NUM_WAVES}")
                 GAME.spawn_enemy_wave()
 
-                if GAME.NUM_WAVES % HEALTH_FREQUENCY == 0:
+                if GAME.NUM_WAVES % GAME.HEALTH_FREQUENCY == 0:
                     GAME.spawn_health()
 
 
-        if showhitboxes:
-            pygame.draw.rect(GAME.SURF, (0, 255, 0), GAME.PLAYER.rect)
+        #if showhitboxes:
+        #    pygame.draw.rect(GAME.SURF, (0, 255, 0), GAME.PLAYER.rect)
 
         GAME.handle_bullet_collisions()
 
@@ -191,7 +186,7 @@ def game():
             elif event.type == MOUSEBUTTONDOWN or (event.type == KEYDOWN and event.key == K_SPACE):  # presses mouse button or press space
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 GAME.PLAYER.shoot(mouse_x, mouse_y, GAME.BULLETS)
-                laser_sound.play()
+                LASER_SOUND.play()
             elif event.type == KEYDOWN and event.key == K_a:  # presses A
                 GAME.PLAYER.is_moving_left = True
             elif event.type == KEYUP and event.key == K_a:  # releases A
@@ -210,16 +205,16 @@ def game():
             elif event.type == KEYDOWN and event.key == K_s:
                 GAME.PLAYER.is_moving_down = True
             # temporary testing line
-            elif event.type == KEYDOWN and event.key == K_e:
-                spawn_enemy()
-            elif event.type == KEYDOWN and event.key == K_h:
-                spawn_health()
-            elif event.type == KEYDOWN and event.key == K_b:
-                showhitboxes = not showhitboxes
+            #elif event.type == KEYDOWN and event.key == K_e:
+            #    spawn_enemy()
+            #elif event.type == KEYDOWN and event.key == K_h:
+            #    spawn_health()
+            #elif event.type == KEYDOWN and event.key == K_b:
+            #    showhitboxes = not showhitboxes
 
-        scoreboardFont.render_to(GAME.SURF, (30, 30), str(GAME.PLAYER.get_score()), (255,255,255))
-        scoreboardFont.render_to(GAME.SURF, (30, 100), str(GAME.PLAYER.hitpoints), (255, 0, 0))
-        scoreboardFont.render_to(GAME.SURF, (GAME.WIDTH * .6, 30), "Best: " + str(data['high_score']), (255,255,0))
+        SCOREBOARD_FONT.render_to(GAME.SURF, (30, 30), str(GAME.PLAYER.get_score()), (255,255,255))
+        SCOREBOARD_FONT.render_to(GAME.SURF, (30, 100), str(GAME.PLAYER.hitpoints), (255, 0, 0))
+        SCOREBOARD_FONT.render_to(GAME.SURF, (GAME.WIDTH * .6, 30), "Best: " + str(data['high_score']), (255,255,0))
 
         # I dont think we need both flip() and update(). I think they do the same thing when you call with no arguments
         pygame.display.flip()
@@ -233,10 +228,10 @@ def welcome():
     load_game = False
     scroll = 0
     while (not load_game):
-        DISPLAYSURF.blit(background_img, (0,0))
+        DISPLAYSURF.blit(BACKGROUND_IMG, (0,0))
         scrollY(DISPLAYSURF, scroll)
         scroll = (scroll + 2)%WINDOW_HEIGHT
-        DISPLAYSURF.blit(title_img, (0,0))
+        DISPLAYSURF.blit(TITLE_IMG, (0,0))
         for event in pygame.event.get():
             if event.type == MOUSEBUTTONDOWN:
                 load_game = True
@@ -260,24 +255,33 @@ class Game:
     BULLETS = []
     PLAYER = None
     HEALTHMODULES = []
-    DIFFICULTY = 0 # 0 for easy/default (to be implemented
+    DIFFICULTY = 0 # 0 for easy/default (to be implemented)
     SURF = None
     NUM_WAVES = 0 # TODO: implement this in the code!!!
     WIDTH = 0
     HEIGHT = 0
+    PLAYER_IMG = None
+    ENEMY_IMG = None
+    HEALTH_IMG = None
+    MAX_HEALTH = 0
+    HEALTH_FREQUENCY = 0
 
-    def __init__(self, difficulty, display_surface, player):
-        self.DIFFICULTY = difficulty
+    def __init__(self, display_surface):
         self.SURF = display_surface
-        self.PLAYER = player
         self.WIDTH = self.SURF.get_size()[0]
         self.HEIGHT = self.SURF.get_size()[1]
+
+    def set_player(self, player):
+        self.PLAYER = player
+
+    def set_difficulty(self, difficutly):
+        self.DIFFICULTY = difficutly
 
     def spawn_health(self):
         speed = random.choice(range(4, 8))
         w = 50 + random.choice(range(self.WIDTH - 100)) # spawn the health so it is not partially off screen
 
-        health = HealthModule(pygame.Rect(w, -80, 75, 75), self.SURF, health_img, speed) # the rectangle size needs to be adjusted
+        health = HealthModule(pygame.Rect(w, -80, 75, 75), self.SURF, self.HEALTH_IMG, speed) # the rectangle size needs to be adjusted
         health.is_moving_down = True
 
         self.HEALTHMODULES.append(health)
@@ -294,7 +298,7 @@ class Game:
         w = random.choice(range(self.SURF.get_size()[0]))
         # enemy spawns just off the top of the screen, so we don't see them pop into existence
 
-        enemy = Enemy(pygame.Rect(w, -80, 100, 105), self.SURF, enemy_img, speed)
+        enemy = Enemy(pygame.Rect(w, -80, 100, 105), self.SURF, self.ENEMY_IMG, speed)
         enemy.is_moving_down = True
         # add left/right movement 1/2 of the time
         if direction == "diagonal":
@@ -320,7 +324,7 @@ class Game:
         for bullet in self.BULLETS:
             x = bullet.rect.centerx
             y = bullet.rect.centery
-            if y < 0 or y > WINDOW_HEIGHT or x < 0 or x > WINDOW_WIDTH:
+            if y < 0 or y > self.HEIGHT or x < 0 or x > self.WIDTH:
                 # remove bullet when it goes off screen
                 self.BULLETS.remove(bullet)
                 continue
@@ -345,7 +349,7 @@ class Game:
                     #    pygame.draw.rect(DISPLAYSURF, (0, 0, 255), enemy.rect)
                     for other_enemy in self.ENEMIES:
                         enemy.bounce_off(other_enemy)
-                    if enemy.rect.centery > WINDOW_HEIGHT:
+                    if enemy.rect.centery > self.HEIGHT:
                         # enemy went off bottom of screen
                         self.ENEMIES.remove(enemy)
                         self.PLAYER.score_minus(1)
@@ -358,7 +362,7 @@ class Game:
                 else:
                     #if showhitboxes:
                     #    pygame.draw.rect(DISPLAYSURF, (255, 0, 0), health.rect)
-                    if health.rect.centery > WINDOW_HEIGHT:
+                    if health.rect.centery > self.HEIGHT:
                         self.HEALTHMODULES.remove(health)
 
     def handle_enemy_collisions(self):
@@ -370,7 +374,7 @@ class Game:
     def handle_health_collisions(self):
         for health in self.HEALTHMODULES:
             if health.did_collide_with(self.PLAYER):
-                if self.PLAYER.hitpoints < MAX_HEALTH:
+                if self.PLAYER.hitpoints < self.MAX_HEALTH:
                     self.PLAYER.hitpoints += 1
                 self.HEALTHMODULES.remove(health)
 
@@ -382,6 +386,18 @@ class Game:
             e.animate()
         for h in self.HEALTHMODULES:
             h.animate()
+
+    # gets the useful info from the config file
+    def configure(self, yamlconfig):
+        PATH = str(Path(__file__).parent.absolute()) + "/"
+        self.NUM_WAVES = yamlconfig['waves']
+        self.HEALTH_FREQUENCY = yamlconfig['health']
+        self.MAX_HEALTH = yamlconfig['maxhealth']
+        assets = yamlconfig['assets']
+
+        self.PLAYER_IMG = pygame.image.load(PATH + assets['player'])
+        self.ENEMY_IMG = pygame.image.load(PATH + assets['enemy'])
+        self.HEALTH_IMG = pygame.image.load(PATH + assets['health'])
 
 
 if __name__ == "__main__":
