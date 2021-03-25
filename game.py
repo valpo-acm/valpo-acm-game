@@ -168,76 +168,20 @@ def game():
                 if GAME.NUM_WAVES % HEALTH_FREQUENCY == 0:
                     GAME.spawn_health()
 
-        GAME.PLAYER.animate()
 
         if showhitboxes:
             pygame.draw.rect(DISPLAYSURF, (0, 255, 0), GAME.PLAYER.rect)
 
+        GAME.handle_bullet_collisions()
 
-        for bullet in GAME.BULLETS:
-            bullet.animate()
-            x = bullet.rect.centerx
-            y = bullet.rect.centery
-            if y < 0 or y > WINDOW_HEIGHT or x < 0 or x > WINDOW_WIDTH:
-                # remove bullet when it goes off screen
-                GAME.BULLETS.remove(bullet)
-                continue
-            if bullet.is_finished_exploding:
-                try:
-                    GAME.BULLETS.remove(bullet)
-                except:
-                    print("failed to remove bullet")
-            for enemy in GAME.ENEMIES:
-                if bullet.did_collide_with(enemy) and bullet.is_exploding is False:
-                    # direct hit!
-                    # TODO add sound effect and explosion animation here
-                    # TODO: we need to fix a bug here; there will be occasions where bullets fail to get
-                    # removed from the list, hence the need for the try-except
-                    bullet.is_exploding = True
-                    enemy.hitpoints -= 1
-                    if enemy.hitpoints < 1:
-                        GAME.ENEMIES.remove(enemy)
-                        GAME.PLAYER.score_plus(1)
-                else:
-                    if showhitboxes:
-                        pygame.draw.rect(DISPLAYSURF, (0, 0, 255), enemy.rect)
-                    for other_enemy in GAME.ENEMIES:
-                        enemy.bounce_off(other_enemy)
-                    if enemy.rect.centery > WINDOW_HEIGHT:
-                        # enemy went off bottom of screen
-                        GAME.ENEMIES.remove(enemy)
-                        GAME.PLAYER.score_minus(1)
+        GAME.handle_health_collisions()
 
-            for health in GAME.HEALTHMODULES:
-                if bullet.did_collide_with(health) and bullet.is_exploding is False:
-                    bullet.is_exploding = True
-                    health.hitpoints -= 1
-                    GAME.HEALTHMODULES.remove(health)
-                else:
-                    if showhitboxes:
-                        pygame.draw.rect(DISPLAYSURF, (255, 0, 0), health.rect)
-                    if health.rect.centery > WINDOW_HEIGHT:
-                        GAME.HEALTHMODULES.remove(health)
+        GAME.handle_enemy_collisions()
 
-        for health in GAME.HEALTHMODULES:
-            if health.did_collide_with(player):
-                if GAME.PLAYER.hitpoints < MAX_HEALTH:
-                    GAME.PLAYER.hitpoints += 1
-                GAME.HEALTHMODULES.remove(health)
+        if not GAME.PLAYER.isAlive():
+            pass
 
-        for enemy in GAME.ENEMIES:
-            if enemy.did_collide_with(player):
-                GAME.PLAYER.hitpoints -= 1
-                print(f"Hitpoints: {GAME.PLAYER.hitpoints}")
-                if not GAME.PLAYER.isAlive():
-                    pass
-                GAME.ENEMIES.remove(enemy)
-        # any that are left
-        for e in GAME.ENEMIES:
-            e.animate()
-
-        for h in GAME.HEALTHMODULES:
-            h.animate()
+        GAME.animate()
 
         # respond to user input events
         for event in pygame.event.get():
@@ -317,17 +261,17 @@ class Game:
     PLAYER = None
     HEALTHMODULES = []
     DIFFICULTY = 0 # 0 for easy/default (to be implemented
-    DISPLAYSURF = None
+    SURF = None
     NUM_WAVES = 0 # TODO: implement this in the code!!!
     WIDTH = 0
     HEIGHT = 0
 
     def __init__(self, difficulty, display_surface, player):
         self.DIFFICULTY = difficulty
-        self.DISPLAYSURF = display_surface
+        self.SURF = display_surface
         self.PLAYER = player
-        self.WIDTH = DISPLAYSURF.get_size()[0]
-        self.HEIGHT = DISPLAYSURF.get_size()[1]
+        self.WIDTH = self.SURF.get_size()[0]
+        self.HEIGHT = self.SURF.get_size()[1]
 
     def spawn_health(self):
         speed = random.choice(range(4, 8))
@@ -371,6 +315,73 @@ class Game:
         for i in range(num_of_enemies):
             self.spawn_enemy()
         self.NUM_WAVES += 1
+
+    def handle_bullet_collisions(self):
+        for bullet in self.BULLETS:
+            x = bullet.rect.centerx
+            y = bullet.rect.centery
+            if y < 0 or y > WINDOW_HEIGHT or x < 0 or x > WINDOW_WIDTH:
+                # remove bullet when it goes off screen
+                self.BULLETS.remove(bullet)
+                continue
+            if bullet.is_finished_exploding:
+                try:
+                    self.BULLETS.remove(bullet)
+                except:
+                    print("failed to remove bullet")
+            for enemy in self.ENEMIES:
+                if bullet.did_collide_with(enemy) and bullet.is_exploding is False:
+                    # direct hit!
+                    # TODO add sound effect and explosion animation here
+                    # TODO: we need to fix a bug here; there will be occasions where bullets fail to get
+                    # removed from the list, hence the need for the try-except
+                    bullet.is_exploding = True
+                    enemy.hitpoints -= 1
+                    if enemy.hitpoints < 1:
+                        self.ENEMIES.remove(enemy)
+                        self.PLAYER.score_plus(1)
+                else:
+                    #if showhitboxes:
+                    #    pygame.draw.rect(DISPLAYSURF, (0, 0, 255), enemy.rect)
+                    for other_enemy in self.ENEMIES:
+                        enemy.bounce_off(other_enemy)
+                    if enemy.rect.centery > WINDOW_HEIGHT:
+                        # enemy went off bottom of screen
+                        self.ENEMIES.remove(enemy)
+                        self.PLAYER.score_minus(1)
+
+            for health in self.HEALTHMODULES:
+                if bullet.did_collide_with(health) and bullet.is_exploding is False:
+                    bullet.is_exploding = True
+                    health.hitpoints -= 1
+                    self.HEALTHMODULES.remove(health)
+                else:
+                    #if showhitboxes:
+                    #    pygame.draw.rect(DISPLAYSURF, (255, 0, 0), health.rect)
+                    if health.rect.centery > WINDOW_HEIGHT:
+                        self.HEALTHMODULES.remove(health)
+
+    def handle_enemy_collisions(self):
+        for enemy in self.ENEMIES:
+            if enemy.did_collide_with(self.PLAYER):
+                self.PLAYER.hitpoints -= 1
+                self.ENEMIES.remove(enemy)
+
+    def handle_health_collisions(self):
+        for health in self.HEALTHMODULES:
+            if health.did_collide_with(self.PLAYER):
+                if self.PLAYER.hitpoints < MAX_HEALTH:
+                    self.PLAYER.hitpoints += 1
+                self.HEALTHMODULES.remove(health)
+
+    def animate(self):
+        self.PLAYER.animate()
+        for b in self.BULLETS:
+            b.animate()
+        for e in self.ENEMIES:
+            e.animate()
+        for h in self.HEALTHMODULES:
+            h.animate()
 
 
 if __name__ == "__main__":
