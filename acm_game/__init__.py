@@ -87,6 +87,7 @@ class Player(GameObject):
 
     hitpoints = 3
     angle = 0
+    score = 0
 
     def __init__(self, rect, surface, image, movement_speed=7):
         super().__init__(rect, surface, movement_speed)
@@ -117,7 +118,29 @@ class Player(GameObject):
         bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface, target_x, target_y)
         bullets_list.append(bullet)
 
+    def get_hitpoints(self):
+        return self.hitpoints
 
+    def isAlive(self):
+        if self.hitpoints < 1:
+            return False
+        return True
+
+    def get_score(self):
+        return self.score
+
+    def set_score(self, score):
+        self.score = score
+
+    def score_plus(self, val):
+        self.score = self.score + val
+
+    def score_minus(self, val):
+        self.score = self.score - val
+
+#TODO: add in a constructor that can take an 'enemy type' like
+# a basic enemy, a stronger enemy, etc etc; we need to do some
+# brainstorming to figure out how we want it to work
 class Enemy(GameObject):
     hitpoints = 1
 
