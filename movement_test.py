@@ -194,7 +194,7 @@ def game():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == MOUSEBUTTONDOWN or (event.type == KEYDOWN and event.key == K_SPACE):  # presses mouse button or press space
+            elif (event.type == MOUSEBUTTONDOWN and event.button == 1) or (event.type == KEYDOWN and event.key == K_SPACE):  # presses mouse button or press space
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 GAME.PLAYER.shoot(mouse_x, mouse_y, GAME.BULLETS)
                 LASER_SOUND.play()
