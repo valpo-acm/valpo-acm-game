@@ -238,6 +238,9 @@ def game():
 def welcome():
     load_game = False
     scroll = 0
+
+    pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR) # if we had a custom crosshair image, we could use that instead
+
     while (not load_game):
         DISPLAYSURF.blit(BACKGROUND_IMG, (0,0))
         scrollY(DISPLAYSURF, scroll)
