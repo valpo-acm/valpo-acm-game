@@ -32,6 +32,16 @@ class Game:
     def set_difficulty(self, difficutly):
         self.DIFFICULTY = difficutly
 
+    def reset_game(self):
+        for enemy in self.ENEMIES:
+            enemy.hitpoints = 0 # remove all enemies
+        for health in self.HEALTHMODULES:
+            health.hitpoints = 0 # remove all health modules
+        del self.ENEMIES[:]
+        del self.HEALTHMODULES[:] # clear arrays of enemies, health modules, and bullets
+        del self.BULLETS[:]
+        self.NUM_WAVES = 0
+
     def spawn_health(self):
         speed = random.choice(range(4, 8))
         w = 50 + random.choice(range(self.WIDTH - 100)) # spawn the health so it is not partially off screen

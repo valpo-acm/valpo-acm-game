@@ -85,7 +85,8 @@ class Player(GameObject):
     # TODO: factor in player_angle to movement
     # TODO: include rotation in draw()
 
-    hitpoints = 3
+    DEFAULT_HITPOINTS = 3 # TODO: include config.yaml reference
+    hitpoints = DEFAULT_HITPOINTS
     angle = 0
     score = 0
 
@@ -120,6 +121,9 @@ class Player(GameObject):
 
     def get_hitpoints(self):
         return self.hitpoints
+
+    def reset_hitpoints(self):
+        self.hitpoints = self.DEFAULT_HITPOINTS
 
     def isAlive(self):
         if self.hitpoints < 1:
@@ -214,7 +218,6 @@ class Bullet(GameObject):
         return "bullet"
 
     def move(self):
-
         self.rect.centerx += self.x_movement_value
         self.rect.centery += self.y_movement_value
 

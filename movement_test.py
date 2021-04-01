@@ -9,6 +9,7 @@ import random
 import pygame.freetype
 import yaml
 from game import Game
+import time
 
 pygame.init()
 
@@ -75,8 +76,9 @@ def gameover():
     if data['high_score'] < GAME.PLAYER.get_score():
         data['high_score'] = GAME.PLAYER.get_score()
         save_data()
-        print(f"New High Score of: {GAME.PLAYER.get_score()}!")
         new_highscore = True
+
+    defeat_time = time.time()
 
     while (not finished):
         scrollY(DISPLAYSURF, scroll)
@@ -84,14 +86,23 @@ def gameover():
 
         DISPLAYSURF.fill(BLACK)
         DISPLAYSURF.blit(GAMEOVER_IMG, (0,0))
+        SCOREBOARD_FONT.render_to(DISPLAYSURF, (60, 2*WINDOW_HEIGHT/3), 'Shoot to play again.', (255, 0, 0)) # TODO: these lines can be removed once the information is included on the background instead
+        SCOREBOARD_FONT.render_to(DISPLAYSURF, (200, 3*WINDOW_HEIGHT/4), 'Q to quit.', (255, 255, 255))
 
         if new_highscore:
             SCOREBOARD_FONT.render_to(DISPLAYSURF, (60, WINDOW_HEIGHT/2), f'New Highscore! {GAME.PLAYER.get_score()}', (255,255,255))
 
         for event in pygame.event.get():
-            if event.type == QUIT: # quit game if user presses close on welcome screen
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_q): # quit game if user presses close or Q on gameover screen
                 pygame.quit()
                 sys.exit()
+            elif event.type == MOUSEBUTTONDOWN or (event.type == KEYDOWN and event.key == K_SPACE):  # presses mouse button or press space
+                if time.time() - defeat_time > 1: # prevent user from immediately starting a new game upon their defeat
+                    GAME.reset_game()
+                    GAME.PLAYER.set_score(0)
+                    GAME.PLAYER.reset_hitpoints()
+                    game() # play game again
+                    gameover() # once the player dies again, rerun gameover
         pygame.display.flip()
 
 
