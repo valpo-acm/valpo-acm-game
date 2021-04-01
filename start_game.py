@@ -1,15 +1,15 @@
 #!/usr/bin/python3.9
 
 import pygame
-import sys
 from pygame.locals import *
-from acm_game import *
+import pygame.freetype
+import sys
 from pathlib import Path
 import random
-import pygame.freetype
 import yaml
-from game import Game
 import time
+from game import Game
+from game_objects import *
 
 pygame.init()
 

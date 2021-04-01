@@ -23,6 +23,9 @@ TODO:
 
 Check Assets
 
+# How to Run
+Run python3.9 on the start_game.py file.
+
 
 Task Spreadsheet: https://docs.google.com/spreadsheets/d/12eTJEbpRYU9EQO5daJohfdozGqfBQUhaskfrgk525vw/edit?usp=sharing
 

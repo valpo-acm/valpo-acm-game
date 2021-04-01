@@ -1,8 +1,8 @@
 import pygame
-import sys
 from pygame.locals import *
-from acm_game import *
+import sys
 import random
+from game_objects import *
 
 class Game:
     # instance variables
