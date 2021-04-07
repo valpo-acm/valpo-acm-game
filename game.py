@@ -141,6 +141,8 @@ class Game:
             if health.did_collide_with(self.PLAYER):
                 if self.PLAYER.hitpoints < self.MAX_HEALTH:
                     self.PLAYER.hitpoints += 1
+                else:
+                    self.PLAYER.score_plus(5)
                 self.HEALTHMODULES.remove(health)
 
     def animate(self):
