@@ -11,11 +11,11 @@ import time
 from game import Game
 from game_objects import *
 
-pygame.init()
 
 WINDOW_HEIGHT = 800
 WINDOW_WIDTH = 600
 
+pygame.init()
 DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 
 # Absolute path of the folder that contains this file.
@@ -38,6 +38,7 @@ def loadconfig():
 
         SCOREBOARD_FONT = pygame.freetype.SysFont(config['font']['style'], config['font']['size'], bold=True)
 
+        # assets is local to this method, hence why it is lowercase
         assets = config['assets']
 
         BACKGROUND_IMG = pygame.image.load(PATH + assets['background'])
@@ -63,10 +64,6 @@ def save_data():
     with open(PATH + 'data.yaml', 'w') as file:
         yaml.dump(data, file)
 
-# Current TODO:
-# - have the player angle impact the distance travelled
-# - use the current mouse position to set the player angle
-
 def gameover():
     scroll = 0
     finished = False
@@ -86,17 +83,20 @@ def gameover():
 
         DISPLAYSURF.fill(BLACK)
         DISPLAYSURF.blit(GAMEOVER_IMG, (0,0))
-        SCOREBOARD_FONT.render_to(DISPLAYSURF, (60, 2*WINDOW_HEIGHT/3), 'Shoot to play again.', (255, 0, 0)) # TODO: these lines can be removed once the information is included on the background instead
+        # TODO: these lines can be removed once the information is included on the background instead
+        SCOREBOARD_FONT.render_to(DISPLAYSURF, (60, 2*WINDOW_HEIGHT/3), 'Shoot to play again.', (255, 0, 0))
         SCOREBOARD_FONT.render_to(DISPLAYSURF, (200, 3*WINDOW_HEIGHT/4), 'Q to quit.', (255, 255, 255))
 
         if new_highscore:
             SCOREBOARD_FONT.render_to(DISPLAYSURF, (60, WINDOW_HEIGHT/2), f'New Highscore! {GAME.PLAYER.get_score()}', (255,255,255))
 
         for event in pygame.event.get():
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_q): # quit game if user presses close or Q on gameover screen
+            # quit game if user presses close or Q on gameover screen
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_q):
                 pygame.quit()
                 sys.exit()
-            elif event.type == MOUSEBUTTONDOWN or (event.type == KEYDOWN and event.key == K_SPACE):  # presses mouse button or press space
+            # presses mouse button or press space, reset the game
+            elif event.type == MOUSEBUTTONDOWN or (event.type == KEYDOWN and event.key == K_SPACE):
                 if time.time() - defeat_time > 1: # prevent user from immediately starting a new game upon their defeat
                     GAME.reset_game()
                     GAME.PLAYER.set_score(0)
@@ -142,25 +142,20 @@ def game():
         # - fill backround
         # - handle scrolling
         # - start a wave if we need to
-        # - animate player
-        # - animate bullets
-        #   - animate enemies
-        #       - determine if enimies go off screen; remove if they do
-        #       - determine if there are any collisions; remove hp if there are any; also remove enemy
-        #       - check if hp is 0; if so, end game
-        # - check for user events
-        # - update display
-        # - update the clock
+        # - handle bullet collisions
+        # - handle health collisions
+        # - handle enemy collisions
+        # - check if player is alive
+        #   - if not, pass
+        # - animate the bullts, health, and player
+        # - handle user input
+        # - update the onscreen info
+        # - increment the FPS clock
 
         # set background color
         GAME.SURF.blit(BACKGROUND_IMG, (0,0))
         scrollY(GAME.SURF, scroll)
         scroll = (scroll + 2)%GAME.HEIGHT
-        # create a player surface, and rotate the player image the appropriate number of degrees
-        # player_angle = 0
-        # PLAYER_SURF = pygame.transform.rotate(player_img, player_angle)
-        # display player image at position
-        # DISPLAYSURF.blit(PLAYER_SURF, (player_x, player_y))
 
         # admittedly this line is a bit hacky; when printing out the value of 'FPSCLOCK.get_time()'
         # prints only 16s, so my original thought was wrong in how it worked. So this line is really
@@ -175,9 +170,6 @@ def game():
                     GAME.spawn_health()
 
 
-        #if showhitboxes:
-        #    pygame.draw.rect(GAME.SURF, (0, 255, 0), GAME.PLAYER.rect)
-
         GAME.handle_bullet_collisions()
 
         GAME.handle_health_collisions()
@@ -191,29 +183,30 @@ def game():
 
         # respond to user input events
         for event in pygame.event.get():
+            # TODO: make this if-else statement a switch statement
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif (event.type == MOUSEBUTTONDOWN and event.button == 1) or (event.type == KEYDOWN and event.key == K_SPACE):  # presses mouse button or press space
+            # presses mouse button or press space
+            elif (event.type == MOUSEBUTTONDOWN and event.button == 1) or (event.type == KEYDOWN and event.key == K_SPACE):
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 GAME.PLAYER.shoot(mouse_x, mouse_y, GAME.BULLETS)
                 LASER_SOUND.play()
-            elif event.type == KEYDOWN and event.key == K_a:  # presses A
+            elif event.type == KEYDOWN and event.key == K_a:  # presses a
                 GAME.PLAYER.is_moving_left = True
-            elif event.type == KEYUP and event.key == K_a:  # releases A
+            elif event.type == KEYUP and event.key == K_a:  # releases a
                 GAME.PLAYER.is_moving_left = False
-            elif event.type == KEYDOWN and event.key == K_d:  # presses D
+            elif event.type == KEYDOWN and event.key == K_d:  # presses d
                 GAME.PLAYER.is_moving_right = True
             elif event.type == KEYUP and event.key == K_d:  # releases d
                 GAME.PLAYER.is_moving_right = False
-                # below is to move player forward and backward, same logic as above
-            elif event.type == KEYUP and event.key == K_w:
+            elif event.type == KEYUP and event.key == K_w: # presses w
                 GAME.PLAYER.is_moving_up = False
-            elif event.type == KEYDOWN and event.key == K_w:
+            elif event.type == KEYDOWN and event.key == K_w: # releases w
                 GAME.PLAYER.is_moving_up = True
-            elif event.type == KEYUP and event.key == K_s:
+            elif event.type == KEYUP and event.key == K_s: # presses s
                 GAME.PLAYER.is_moving_down = False
-            elif event.type == KEYDOWN and event.key == K_s:
+            elif event.type == KEYDOWN and event.key == K_s: # releases s
                 GAME.PLAYER.is_moving_down = True
             # temporary testing line
             #elif event.type == KEYDOWN and event.key == K_e:
@@ -239,8 +232,13 @@ def welcome():
     load_game = False
     scroll = 0
 
-    pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR) # if we had a custom crosshair image, we could use that instead
+    # if we had a custom crosshair image, we could use that instead
+    pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
 
+    # This is effectively our 'welcome' screen to the game;
+    # it's just a while loop that runs forever and diplays the
+    # Cover image for the game, and scrolls the background.
+    # any mouse interaction breaks the loop, and the game begins
     while (not load_game):
         DISPLAYSURF.blit(BACKGROUND_IMG, (0,0))
         scrollY(DISPLAYSURF, scroll)
