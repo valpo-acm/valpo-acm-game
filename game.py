@@ -6,18 +6,22 @@ from game_objects import *
 
 class Game:
     # instance variables
+    # On screen game objects
     ENEMIES = []
     BULLETS = []
     PLAYER = None
     HEALTHMODULES = []
-    DIFFICULTY = 0 # 0 for easy/default (to be implemented)
-    SURF = None
-    NUM_WAVES = 0 # TODO: implement this in the code!!!
-    WIDTH = 0
-    HEIGHT = 0
+    # images to display for each of the different characters
     PLAYER_IMG = None
     ENEMY_IMG = None
     HEALTH_IMG = None
+
+    DIFFICULTY = 0 # 0 for easy/default (to be implemented)
+    SURF = None # the pygame surface that the game will be displayed on
+    NUM_WAVES = 0 # TODO: implement this in the code!!!
+    WIDTH = 0
+    HEIGHT = 0
+
     MAX_HEALTH = 0
     HEALTH_FREQUENCY = 0
 
@@ -51,6 +55,8 @@ class Game:
 
         self.HEALTHMODULES.append(health)
 
+    # is wave is more accurately described as an 'if_wave' - it determines whether or not
+    # a game tick will spawn a wave.
     def is_wave(self):
         if len(self.ENEMIES) < 3:
             return True
@@ -59,8 +65,10 @@ class Game:
     def spawn_enemy(self):
         direction = random.choice(["diagonal", "down"])
         speed = random.choice(range(2, 8))
-        # TODO: check to make sure the width is the first element in the tuple!!
+        # w is a point along the top of the screen; this is where the enemy will 'spawn' at
         w = random.choice(range(self.SURF.get_size()[0]))
+        # the above line should be changed to be more consistent with the rest of the naming scheme
+
         # enemy spawns just off the top of the screen, so we don't see them pop into existence
 
         enemy = Enemy(pygame.Rect(w, -80, 100, 105), self.SURF, self.ENEMY_IMG, speed)
@@ -77,8 +85,10 @@ class Game:
 
     def spawn_enemy_wave(self):
         # .3 * number of prev waves - we want 1 more enemy for every 3 waves
-        # player_score % 3 - this is a way to add randomness to the waves, while not being taxing on resources; will spawn between 0 and 2 enemies
-        # player_hp * .5 - we subtract this value, because as player health goes down, the number of enemy spawns goes up; a penalty for taking damage
+        # player_score % 3 - this is a way to add randomness to the waves, while not being taxing on resources;
+        #                    will spawn between 0 and 2 enemies
+        # player_hp * .5 - we subtract this value, because as player health goes down, the number of enemy spawns goes up;
+        #                  a penalty for taking damage
         # and lastly the + 3 ; this is so that we meet the 'wave' conditions
         num_of_enemies = int((.3 * self.NUM_WAVES) + (self.PLAYER.get_score() % 3) - (self.PLAYER.get_hitpoints() * .5) + 3)
         for i in range(num_of_enemies):
@@ -110,8 +120,6 @@ class Game:
                         self.ENEMIES.remove(enemy)
                         self.PLAYER.score_plus(1)
                 else:
-                    #if showhitboxes:
-                    #    pygame.draw.rect(DISPLAYSURF, (0, 0, 255), enemy.rect)
                     for other_enemy in self.ENEMIES:
                         enemy.bounce_off(other_enemy)
                     if enemy.rect.centery > self.HEIGHT:
@@ -125,8 +133,6 @@ class Game:
                     health.hitpoints -= 1
                     self.HEALTHMODULES.remove(health)
                 else:
-                    #if showhitboxes:
-                    #    pygame.draw.rect(DISPLAYSURF, (255, 0, 0), health.rect)
                     if health.rect.centery > self.HEIGHT:
                         self.HEALTHMODULES.remove(health)
 
@@ -154,7 +160,7 @@ class Game:
         for h in self.HEALTHMODULES:
             h.animate()
 
-    # gets the useful info from the config file
+    # gets the pertinent info from the config file
     def configure(self, yamlconfig, path):
         self.NUM_WAVES = yamlconfig['waves']
         self.HEALTH_FREQUENCY = yamlconfig['health']
