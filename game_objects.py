@@ -11,6 +11,9 @@ class GameObject:
     is_moving_up = False
     is_moving_down = False
 
+    # counter is used to determine how the enemies zigzag; if the counter mod
+    # some random number is zero, then the enemies change direction
+    # counter is also incremented every tick
     counter = 1
 
     def __init__(self, rect, surface, movement_speed, color=(0, 0, 0)):
@@ -114,6 +117,8 @@ class Player(GameObject):
 
     def shoot(self, target_x, target_y, bullets_list):
         # TODO: is there a more elegant way to do this than passing in the bullets list?
+        # possible solution - make the list of bullets a instance variable of the player
+        # object
         x = self.rect.centerx
         y = self.rect.centery - 40
         bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface, target_x, target_y)
