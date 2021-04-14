@@ -67,6 +67,11 @@ def save_data():
 # - have the player angle impact the distance travelled
 # - use the current mouse position to set the player angle
 
+def play_music(): # TODO: This doesn't work yet
+    pygame.mixer.music.play(-1)
+    # -1 tels you to keep looping the music file infinitely.
+    # 0 will set the music to stop and the music will not play in the background
+
 def gameover():
     scroll = 0
     finished = False
