@@ -82,7 +82,6 @@ class GameObject:
 
 class Player(GameObject):
     # TODO: factor in player_angle to movement
-    # TODO: include rotation in draw()
 
     DEFAULT_HITPOINTS = 3 # TODO: include config.yaml reference
     hitpoints = DEFAULT_HITPOINTS
