@@ -84,9 +84,7 @@ class GameObject:
 
 
 class Player(GameObject):
-    # TODO: include rotation
     # TODO: factor in player_angle to movement
-    # TODO: include rotation in draw()
 
     DEFAULT_HITPOINTS = 3 # TODO: include config.yaml reference
     hitpoints = DEFAULT_HITPOINTS
@@ -113,7 +111,8 @@ class Player(GameObject):
         super().move()
 
     def draw(self):
-        self.surface.blit(self.image, self.rect.topleft)
+        rotated_image = pygame.transform.rotate(self.image, self.get_angle())
+        self.surface.blit(rotated_image, self.rect.topleft)
 
     def shoot(self, target_x, target_y, bullets_list):
         # TODO: is there a more elegant way to do this than passing in the bullets list?
@@ -123,6 +122,17 @@ class Player(GameObject):
         y = self.rect.centery - 40
         bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface, target_x, target_y)
         bullets_list.append(bullet)
+
+    # Returns the angle that bullets should be shooting toward with respect to the player.
+    def get_angle(self): # expecting 0 degrees to be perfectly straight forward, degrees reset after 360
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        player_x = self.rect.centerx
+        player_y = self.rect.centery
+        delta_x = mouse_x - player_x
+        delta_y = player_y - mouse_y
+        degrees = math.degrees(math.atan2(delta_y, delta_x))
+
+        return (degrees - 90) % 360
 
     def get_hitpoints(self):
         return self.hitpoints

@@ -11,11 +11,11 @@ import time
 from game import Game
 from game_objects import *
 
+pygame.init()
 
 WINDOW_HEIGHT = 800
 WINDOW_WIDTH = 600
 
-pygame.init()
 DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 
 # Absolute path of the folder that contains this file.
@@ -64,6 +64,15 @@ def save_data():
     with open(PATH + 'data.yaml', 'w') as file:
         yaml.dump(data, file)
 
+# Current TODO:
+# - have the player angle impact the distance travelled
+# - use the current mouse position to set the player angle
+
+def play_music(): # TODO: This doesn't work yet
+    pygame.mixer.music.play(-1)
+    # -1 tels you to keep looping the music file infinitely.
+    # 0 will set the music to stop and the music will not play in the background
+
 def gameover():
     scroll = 0
     finished = False
@@ -91,12 +100,10 @@ def gameover():
             SCOREBOARD_FONT.render_to(DISPLAYSURF, (60, WINDOW_HEIGHT/2), f'New Highscore! {GAME.PLAYER.get_score()}', (255,255,255))
 
         for event in pygame.event.get():
-            # quit game if user presses close or Q on gameover screen
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_q):
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_q): # quit game if user presses close or Q on gameover screen
                 pygame.quit()
                 sys.exit()
-            # presses mouse button or press space, reset the game
-            elif event.type == MOUSEBUTTONDOWN or (event.type == KEYDOWN and event.key == K_SPACE):
+            elif event.type == MOUSEBUTTONDOWN or (event.type == KEYDOWN and event.key == K_SPACE):  # presses mouse button or press space
                 if time.time() - defeat_time > 1: # prevent user from immediately starting a new game upon their defeat
                     GAME.reset_game()
                     GAME.PLAYER.set_score(0)
@@ -156,6 +163,11 @@ def game():
         GAME.SURF.blit(BACKGROUND_IMG, (0,0))
         scrollY(GAME.SURF, scroll)
         scroll = (scroll + 2)%GAME.HEIGHT
+        # create a player surface, and rotate the player image the appropriate number of degrees
+        # player_angle = 0
+        # PLAYER_SURF = pygame.transform.rotate(player_img, player_angle)
+        # display player image at position
+        # DISPLAYSURF.blit(PLAYER_SURF, (player_x, player_y))
 
         # admittedly this line is a bit hacky; when printing out the value of 'FPSCLOCK.get_time()'
         # prints only 16s, so my original thought was wrong in how it worked. So this line is really
@@ -169,6 +181,9 @@ def game():
                 if GAME.NUM_WAVES % GAME.HEALTH_FREQUENCY == 0:
                     GAME.spawn_health()
 
+
+        #if showhitboxes:
+        #    pygame.draw.rect(GAME.SURF, (0, 255, 0), GAME.PLAYER.rect)
 
         GAME.handle_bullet_collisions()
 
