@@ -163,11 +163,6 @@ def game():
         GAME.SURF.blit(BACKGROUND_IMG, (0,0))
         scrollY(GAME.SURF, scroll)
         scroll = (scroll + 2)%GAME.HEIGHT
-        # create a player surface, and rotate the player image the appropriate number of degrees
-        # player_angle = 0
-        # PLAYER_SURF = pygame.transform.rotate(player_img, player_angle)
-        # display player image at position
-        # DISPLAYSURF.blit(PLAYER_SURF, (player_x, player_y))
 
         # admittedly this line is a bit hacky; when printing out the value of 'FPSCLOCK.get_time()'
         # prints only 16s, so my original thought was wrong in how it worked. So this line is really
@@ -262,10 +257,9 @@ def welcome():
         for event in pygame.event.get():
             if event.type == MOUSEBUTTONDOWN:
                 load_game = True
-
-        if event.type == QUIT: # quit game if user presses close on welcome screen
-            pygame.quit()
-            sys.exit()
+            elif event.type == QUIT: # quit game if user presses close on welcome screen
+                pygame.quit()
+                sys.exit()
         pygame.display.flip()
 
 
