@@ -12,17 +12,21 @@ fps: 60
 # (Default: 0)
 waves: 0
 
-# Modify volume percentage. 
+# Modify volume percentage.
 # (Default: 100)
 volume: 100
 
 # Font used for the score in the corner.
-# (Default: 
-#       style: "Comic Sans MS" 
+# (Default:
+#       style: "Comic Sans MS"
 #       size: 50)
 font:
         style: "Comic Sans MS"
         size: 50
+
+# The amount of hit points the player has at the beginning of the game.
+# (Default: 3)
+default_hitpoints: 3
 
 # How frequently will player health modules spawn in a wave.
 # (Default: 4)

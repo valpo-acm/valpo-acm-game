@@ -90,12 +90,13 @@ class Player(GameObject):
 
     DEFAULT_HITPOINTS = 3 # TODO: include config.yaml reference
     hitpoints = DEFAULT_HITPOINTS
-    angle = 0
     score = 0
 
-    def __init__(self, rect, surface, image, movement_speed=7):
+    def __init__(self, rect, surface, image, default_hitpoints, movement_speed=7):
         super().__init__(rect, surface, movement_speed, (0, 255, 0))
         self.image = image
+        self.DEFAULT_HITPOINTS = default_hitpoints
+        self.hitpoints = self.DEFAULT_HITPOINTS
 
     def __str__(self):
         return "Player"
