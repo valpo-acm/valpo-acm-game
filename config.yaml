@@ -50,3 +50,4 @@ assets:
         laser: "assets/laser-gun-19sf.wav"
         hit: "assets/hit.wav" # TODO: hit sounds and music not yet used
         music: "assets/music.wav"
+        explosion: "assets/explosion/explosion%%.png" # '%%' is replaced with the current counter number

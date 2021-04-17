@@ -88,15 +88,17 @@ class GameObject:
 class Player(GameObject):
     # TODO: factor in player_angle to movement
 
-    DEFAULT_HITPOINTS = 3 # TODO: include config.yaml reference
+    DEFAULT_HITPOINTS = 3
     hitpoints = DEFAULT_HITPOINTS
     score = 0
+    bullet_image = None
 
-    def __init__(self, rect, surface, image, default_hitpoints, movement_speed=7):
+    def __init__(self, rect, surface, image, bullet_image, default_hitpoints, movement_speed=7):
         super().__init__(rect, surface, movement_speed, (0, 255, 0))
         self.image = image
         self.DEFAULT_HITPOINTS = default_hitpoints
         self.hitpoints = self.DEFAULT_HITPOINTS
+        self.bullet_image = bullet_image
 
     def __str__(self):
         return "Player"
@@ -123,7 +125,7 @@ class Player(GameObject):
         # object
         x = self.rect.centerx
         y = self.rect.centery - 40
-        bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface, target_x, target_y)
+        bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface, target_x, target_y, self.bullet_image)
         bullets_list.append(bullet)
 
     # Returns the angle that bullets should be shooting toward with respect to the player.
@@ -225,12 +227,14 @@ class Bullet(GameObject):
     explosion_counter = 0
     is_exploding = False
     is_finished_exploding = False
+    image = None # This is only the path to the image. Use get_explosion_path() instead
 
-    def __init__(self, rect, surface, target_x, target_y, movement_speed=15):
+    def __init__(self, rect, surface, target_x, target_y, image, movement_speed=15):
         super().__init__(rect, surface, movement_speed, color=(255, 255, 255))
         self.x_movement_value = 0
         self.y_movement_value = 0
         self.calculate_movement_values(target_x, target_y)
+        self.image = image
 
     def __str__(self):
         return "bullet"
@@ -257,7 +261,7 @@ class Bullet(GameObject):
             super().animate()
 
     def get_explosion_path(self):
-        return f'assets/explosion/explosion{self.explosion_counter}.png'
+        return self.image.replace('%%', str(self.explosion_counter), 1) # the 1 means that only the first occurrence of '%%' will be replaced.
 
     def calculate_movement_values(self, target_x, target_y):
 

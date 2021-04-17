@@ -23,7 +23,7 @@ PATH = str(Path(__file__).parent.absolute()) + "/"
 
 # load image and sound files from filepath strings, also load data
 def loadconfig():
-    global BG, BLACK, FPS, DEFAULT_HITPOINTS, SCOREBOARD_FONT, BACKGROUND_IMG, TITLE_IMG, GAMEOVER_IMG, LASER_SOUND, hit, music, data
+    global BG, BLACK, FPS, DEFAULT_HITPOINTS, SCOREBOARD_FONT, BACKGROUND_IMG, TITLE_IMG, GAMEOVER_IMG, LASER_SOUND, hit, music, EXPLOSION_PATH, data
 
     # Open and close the config file safely.
     with open(PATH + 'config.yaml', 'r') as file:
@@ -49,6 +49,7 @@ def loadconfig():
         LASER_SOUND = pygame.mixer.Sound(PATH + assets['laser'])
         #hit = pygame.mixer.Sound(PATH + assets['hit'])
         #music = pygame.mixer.music.load(PATH + assets['music']) TODO: Not added yet
+        EXPLOSION_PATH = PATH + assets['explosion']
 
         LASER_SOUND.set_volume(config['volume']/100)
 
@@ -138,7 +139,7 @@ def game():
     with open(PATH + 'config.yaml', 'r') as file:
         GAME.configure(yaml.safe_load(file), PATH)
     # create player object with initial location. Size is approximate based on image file
-    player = Player(pygame.Rect(.4 * GAME.WIDTH, .66 * GAME.HEIGHT, 100, 130), GAME.SURF, GAME.PLAYER_IMG, DEFAULT_HITPOINTS)
+    player = Player(pygame.Rect(.4 * GAME.WIDTH, .66 * GAME.HEIGHT, 100, 130), GAME.SURF, GAME.PLAYER_IMG, EXPLOSION_PATH, DEFAULT_HITPOINTS)
     GAME.set_player(player)
     GAME.set_difficulty(0) # effectively 'easy'
 
