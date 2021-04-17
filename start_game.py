@@ -150,9 +150,10 @@ def game():
         # - handle bullet collisions
         # - handle health collisions
         # - handle enemy collisions
+        # - draw hitboxes, if necessary
         # - check if player is alive
         #   - if not, pass
-        # - animate the bullts, health, and player
+        # - animate the bullets, health, and player
         # - handle user input
         # - update the onscreen info
         # - increment the FPS clock
@@ -241,7 +242,7 @@ def welcome():
     scroll = 0
 
     # if we had a custom crosshair image, we could use that instead
-    pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
 
     # This is effectively our 'welcome' screen to the game;
     # it's just a while loop that runs forever and diplays the

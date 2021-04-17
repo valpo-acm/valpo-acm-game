@@ -116,9 +116,6 @@ class Game:
             for enemy in self.ENEMIES:
                 if bullet.did_collide_with(enemy) and bullet.is_exploding is False:
                     # direct hit!
-                    # TODO add sound effect and explosion animation here
-                    # TODO: we need to fix a bug here; there will be occasions where bullets fail to get
-                    # removed from the list, hence the need for the try-except
                     bullet.is_exploding = True
                     enemy.hitpoints -= 1
                     if enemy.hitpoints < 1:
