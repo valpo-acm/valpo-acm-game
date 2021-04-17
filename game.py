@@ -25,10 +25,15 @@ class Game:
     MAX_HEALTH = 0
     HEALTH_FREQUENCY = 0
 
+    HITBOXES = False
+
     def __init__(self, display_surface):
         self.SURF = display_surface
         self.WIDTH = self.SURF.get_size()[0]
         self.HEIGHT = self.SURF.get_size()[1]
+
+    def toggle_hitbox_visibility(self):
+        self.HITBOXES = not self.HITBOXES
 
     def set_player(self, player):
         self.PLAYER = player
@@ -159,6 +164,13 @@ class Game:
             e.animate()
         for h in self.HEALTHMODULES:
             h.animate()
+
+    def draw_hitboxes(self):
+        self.PLAYER.draw_hitbox(self.SURF)
+        for e in self.ENEMIES:
+            e.draw_hitbox(self.SURF)
+        for h in self.HEALTHMODULES:
+            h.draw_hitbox(self.SURF)
 
     # gets the pertinent info from the config file
     def configure(self, yamlconfig, path):

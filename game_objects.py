@@ -82,6 +82,8 @@ class GameObject:
         if self.is_moving_down:
             print("Moving down")
 
+    def draw_hitbox(self, surf):
+        pygame.draw.rect(surf, self.color, self.rect)
 
 class Player(GameObject):
     # TODO: factor in player_angle to movement
@@ -92,7 +94,7 @@ class Player(GameObject):
     score = 0
 
     def __init__(self, rect, surface, image, movement_speed=7):
-        super().__init__(rect, surface, movement_speed)
+        super().__init__(rect, surface, movement_speed, (0, 255, 0))
         self.image = image
 
     def __str__(self):
@@ -164,7 +166,7 @@ class Enemy(GameObject):
     hitpoints = 1
 
     def __init__(self, rect, surface, image, movement_speed=7):
-        super().__init__(rect, surface, movement_speed)
+        super().__init__(rect, surface, movement_speed, (255, 0, 0))
         self.image = image
 
     def __str__(self):
@@ -209,7 +211,7 @@ class HealthModule(GameObject):
     hitpoints = 1
 
     def __init__(self, rect, surface, image, movement_speed=1):
-        super().__init__(rect, surface, movement_speed)
+        super().__init__(rect, surface, movement_speed, (0, 0, 255))
         self.image = image
 
     def __str__(self):

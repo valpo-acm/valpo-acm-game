@@ -140,8 +140,6 @@ def game():
     GAME.set_player(player)
     GAME.set_difficulty(0) # effectively 'easy'
 
-    #showhitboxes = False
-
     scroll = 0  #scrolling
     # main game loop
     while GAME.PLAYER.isAlive():
@@ -177,8 +175,8 @@ def game():
                     GAME.spawn_health()
 
 
-        #if showhitboxes:
-        #    pygame.draw.rect(GAME.SURF, (0, 255, 0), GAME.PLAYER.rect)
+        if GAME.HITBOXES:
+            GAME.draw_hitboxes()
 
         GAME.handle_bullet_collisions()
 
@@ -219,12 +217,12 @@ def game():
             elif event.type == KEYDOWN and event.key == K_s: # releases s
                 GAME.PLAYER.is_moving_down = True
             # temporary testing line
-            #elif event.type == KEYDOWN and event.key == K_e:
-            #    spawn_enemy()
-            #elif event.type == KEYDOWN and event.key == K_h:
-            #    spawn_health()
-            #elif event.type == KEYDOWN and event.key == K_b:
-            #    showhitboxes = not showhitboxes
+            elif event.type == KEYDOWN and event.key == K_e:
+                GAME.spawn_enemy()
+            elif event.type == KEYDOWN and event.key == K_h:
+                GAME.spawn_health()
+            elif event.type == KEYDOWN and event.key == K_b:
+                GAME.toggle_hitbox_visibility()
 
         SCOREBOARD_FONT.render_to(GAME.SURF, (30, 30), str(GAME.PLAYER.get_score()), (255,255,255))
         SCOREBOARD_FONT.render_to(GAME.SURF, (30, 100), str(GAME.PLAYER.hitpoints), (255, 0, 0))
