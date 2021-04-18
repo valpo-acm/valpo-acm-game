@@ -176,8 +176,16 @@ class Enemy(GameObject):
         return "enemy"
 
     def draw(self):
-        # TODO: blit image at rect location if image exists, else call object draw method
-        self.surface.blit(self.image, self.rect.topleft)
+        rotated_image = pygame.transform.rotate(self.image, self.get_angle())
+        self.surface.blit(rotated_image, self.rect.topleft)
+
+    def get_angle(self):
+        if self.is_moving_left and not self.is_moving_right: # moving left
+            return 300
+        elif not self.is_moving_left and self.is_moving_right: # moving right
+            return 60
+        else: # moving down
+            return 0
 
     def move(self):
         self.zigzag()
