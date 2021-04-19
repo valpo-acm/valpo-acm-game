@@ -139,7 +139,7 @@ def game():
     with open(PATH + 'config.yaml', 'r') as file:
         GAME.configure(yaml.safe_load(file), PATH)
     # create player object with initial location. Size is approximate based on image file
-    player = Player(pygame.Rect(.4 * GAME.WIDTH, .66 * GAME.HEIGHT, 100, 130), GAME.SURF, GAME.PLAYER_IMG, EXPLOSION_PATH, DEFAULT_HITPOINTS)
+    player = Player(pygame.Rect(.4 * GAME.WIDTH, .66 * GAME.HEIGHT, 100, 130), GAME.SURF, GAME.PLAYER_IMG, DEFAULT_HITPOINTS)
     GAME.set_player(player)
     GAME.set_difficulty(0) # effectively 'easy'
 
@@ -202,7 +202,7 @@ def game():
             # presses mouse button or press space
             elif (event.type == MOUSEBUTTONDOWN and event.button == 1) or (event.type == KEYDOWN and event.key == K_SPACE):
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                GAME.PLAYER.shoot(mouse_x, mouse_y, GAME.BULLETS)
+                GAME.PLAYER.shoot(mouse_x, mouse_y, EXPLOSION_PATH)
                 LASER_SOUND.play()
             elif event.type == KEYDOWN and event.key == K_a:  # presses a
                 GAME.PLAYER.is_moving_left = True

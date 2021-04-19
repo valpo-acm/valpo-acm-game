@@ -8,7 +8,6 @@ class Game:
     # instance variables
     # On screen game objects
     ENEMIES = []
-    BULLETS = []
     PLAYER = None
     HEALTHMODULES = []
     # images to display for each of the different characters
@@ -46,9 +45,11 @@ class Game:
             enemy.hitpoints = 0 # remove all enemies
         for health in self.HEALTHMODULES:
             health.hitpoints = 0 # remove all health modules
+        # removing all enemies from the array removes all pointers to all enemies thus
+        # also clearing their bullets if the Python garbage collection works similar to Java
         del self.ENEMIES[:]
         del self.HEALTHMODULES[:] # clear arrays of enemies, health modules, and bullets
-        del self.BULLETS[:]
+        del self.PLAYER.bullets[:]
         self.NUM_WAVES = 0
 
     def spawn_health(self):
@@ -100,19 +101,17 @@ class Game:
             self.spawn_enemy()
         self.NUM_WAVES += 1
 
+    def get_all_bullets(self):
+        list = self.PLAYER.bullets
+        for enemy in self.ENEMIES:
+            list += enemy.bullets
+        return list
+
     def handle_bullet_collisions(self):
-        for bullet in self.BULLETS:
-            x = bullet.rect.centerx
-            y = bullet.rect.centery
-            if y < 0 or y > self.HEIGHT or x < 0 or x > self.WIDTH:
-                # remove bullet when it goes off screen
-                self.BULLETS.remove(bullet)
+        for bullet in self.PLAYER.bullets: # player shot the bullet
+            if self.handle_all_bullets(bullet):
+                self.PLAYER.bullets.remove(bullet)
                 continue
-            if bullet.is_finished_exploding:
-                try:
-                    self.BULLETS.remove(bullet)
-                except:
-                    print("failed to remove bullet")
             for enemy in self.ENEMIES:
                 if bullet.did_collide_with(enemy) and bullet.is_exploding is False:
                     # direct hit!
@@ -121,28 +120,39 @@ class Game:
                     if enemy.hitpoints < 1:
                         self.ENEMIES.remove(enemy)
                         self.PLAYER.score_plus(1)
-                else:
-                    for other_enemy in self.ENEMIES:
-                        enemy.bounce_off(other_enemy)
-                    if enemy.rect.centery > self.HEIGHT:
-                        # enemy went off bottom of screen
-                        self.ENEMIES.remove(enemy)
-                        self.PLAYER.score_minus(1)
-
-            for health in self.HEALTHMODULES:
-                if bullet.did_collide_with(health) and bullet.is_exploding is False:
+        for enemy in self.ENEMIES:
+            for bullet in enemy.bullets: # enemy shot the bullet
+                if self.handle_all_bullets(bullet):
+                    enemy.bullets.remove(bullet)
+                    continue
+                if bullet.did_collide_with(self.PLAYER) and bullet.is_exploding is False:
                     bullet.is_exploding = True
-                    health.hitpoints -= 1
-                    self.HEALTHMODULES.remove(health)
-                else:
-                    if health.rect.centery > self.HEIGHT:
-                        self.HEALTHMODULES.remove(health)
+                    self.PLAYER.hitpoints -= 1
+
+    def handle_all_bullets(self, bullet): # return true when bullet needs to be removed
+        x = bullet.rect.centerx
+        y = bullet.rect.centery
+        if y < 0 or y > self.HEIGHT or x < 0 or x > self.WIDTH:
+            # remove bullet when it goes off screen
+            return True
+        for health in self.HEALTHMODULES:
+            if bullet.did_collide_with(health) and bullet.is_exploding is False:
+                bullet.is_exploding = True
+                health.hitpoints -= 1
+                self.HEALTHMODULES.remove(health)
+        return bullet.is_finished_exploding
 
     def handle_enemy_collisions(self):
         for enemy in self.ENEMIES:
             if enemy.did_collide_with(self.PLAYER):
                 self.PLAYER.hitpoints -= 1
                 self.ENEMIES.remove(enemy)
+            if enemy.rect.centery > self.HEIGHT:
+                # enemy went off bottom of screen
+                self.ENEMIES.remove(enemy)
+                self.PLAYER.score_minus(1)
+            for other_enemy in self.ENEMIES:
+                enemy.bounce_off(other_enemy)
 
     def handle_health_collisions(self):
         for health in self.HEALTHMODULES:
@@ -152,10 +162,13 @@ class Game:
                 else:
                     self.PLAYER.score_plus(5)
                 self.HEALTHMODULES.remove(health)
+            if health.rect.centery > self.HEIGHT:
+                # health went off bottom of screen
+                self.HEALTHMODULES.remove(health)
 
     def animate(self):
         self.PLAYER.animate()
-        for b in self.BULLETS:
+        for b in self.get_all_bullets():
             b.animate()
         for e in self.ENEMIES:
             e.animate()

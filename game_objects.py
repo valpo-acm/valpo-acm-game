@@ -85,20 +85,33 @@ class GameObject:
     def draw_hitbox(self, surf):
         pygame.draw.rect(surf, self.color, self.rect)
 
-class Player(GameObject):
+class ShootingGameObject(GameObject):
+
+    def __init__(self, rect, surface, movement_speed, color=(0, 0, 0)):
+        super().__init__(rect, surface, movement_speed, color)
+        self.bullets = []
+
+    # returns the source of the bullet as an ordered pair
+    def get_source(self):
+        return self.rect.centerx, self.rect.centery
+
+    def shoot(self, target_x, target_y, bullet_image):
+        x, y = self.get_source()
+        bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface, target_x, target_y, bullet_image)
+        self.bullets.append(bullet)
+
+class Player(ShootingGameObject):
     # TODO: factor in player_angle to movement
 
     DEFAULT_HITPOINTS = 3
     hitpoints = DEFAULT_HITPOINTS
     score = 0
-    bullet_image = None
 
-    def __init__(self, rect, surface, image, bullet_image, default_hitpoints, movement_speed=7):
+    def __init__(self, rect, surface, image, default_hitpoints, movement_speed=7):
         super().__init__(rect, surface, movement_speed, (0, 255, 0))
         self.image = image
         self.DEFAULT_HITPOINTS = default_hitpoints
         self.hitpoints = self.DEFAULT_HITPOINTS
-        self.bullet_image = bullet_image
 
     def __str__(self):
         return "Player"
@@ -119,14 +132,8 @@ class Player(GameObject):
         rotated_image = pygame.transform.rotate(self.image, self.get_angle())
         self.surface.blit(rotated_image, self.rect.topleft)
 
-    def shoot(self, target_x, target_y, bullets_list):
-        # TODO: is there a more elegant way to do this than passing in the bullets list?
-        # possible solution - make the list of bullets a instance variable of the player
-        # object
-        x = self.rect.centerx
-        y = self.rect.centery - 40
-        bullet = Bullet(pygame.Rect(x, y, 10, 10), self.surface, target_x, target_y, self.bullet_image)
-        bullets_list.append(bullet)
+    def get_source(self):
+        return self.rect.centerx, self.rect.centery - 40
 
     # Returns the angle that bullets should be shooting toward with respect to the player.
     def get_angle(self): # expecting 0 degrees to be perfectly straight forward, degrees reset after 360
@@ -165,7 +172,7 @@ class Player(GameObject):
 #TODO: add in a constructor that can take an 'enemy type' like
 # a basic enemy, a stronger enemy, etc etc; we need to do some
 # brainstorming to figure out how we want it to work
-class Enemy(GameObject):
+class Enemy(ShootingGameObject):
     hitpoints = 1
 
     def __init__(self, rect, surface, image, movement_speed=7):
